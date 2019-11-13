@@ -5,6 +5,14 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.ArrayList" %>
+
+
+<%@ page import="noob.plantsystem.ui.web.BackendCommunicationHandler" %>
+<%@ page import="noob.plantsystem.common.ArduinoProxy" %>
+
+
 <!DOCTYPE html>
 <html>
     <head>
@@ -14,12 +22,14 @@
     <body>
         <h1>Plant growth cluster management system web interface.</h1>
         <p>
-
-            
-            
-        <form name="DownloadDB">
-            <button name="downloadDB" action="DatabaseBackupViewServlet"/>
-        </form>            
+            <%
+                BackendCommunicationHandler backend = new BackendCommunicationHandler();
+                boolean connected = backend.connect();
+                if (connected) {
+                    ArrayList<ArduinoProxy> systems = backend.getSystemsView(300);
+                    out.print(systems);
+                }
+            %>
         </p>
     </body>
 </html>
