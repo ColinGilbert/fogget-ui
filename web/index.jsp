@@ -5,9 +5,11 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.HashMap" %>
+<%@ page import="java.util.TreeMap" %>
 <%@ page import="java.util.ArrayList" %>
-
+<%@ page import="java.util.ArrayDeque" %>
+<%@ page import="noob.plantsystem.common.EventRecord" %>
+        
 
 <%@ page import="noob.plantsystem.ui.web.BackendCommunicationHandler" %>
 <%@ page import="noob.plantsystem.common.ArduinoProxy" %>
@@ -26,8 +28,9 @@
                 BackendCommunicationHandler backend = new BackendCommunicationHandler();
                 boolean connected = backend.connect();
                 if (connected) {
-                    ArrayList<ArduinoProxy> systems = backend.getSystemsView(300);
+                    ArrayList<ArduinoProxy> systems = backend.getSystemsView();
                     out.print(systems);
+                   // TreeMap<Long, ArrayDeque<EventRecord>> events = backend.getEventsView();
                 }
             %>
         </p>

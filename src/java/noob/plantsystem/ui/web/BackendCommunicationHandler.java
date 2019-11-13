@@ -77,7 +77,7 @@ public class BackendCommunicationHandler {
         return true;
     }
 
-    public ArrayList<ArduinoProxy> getSystemsView(long timeout) {
+    public ArrayList<ArduinoProxy> getSystemsView() {
         try {
             Socket socket = new Socket("127.0.0.1", 6777);
             Scanner tcpIn = new Scanner(socket.getInputStream());
@@ -93,7 +93,7 @@ public class BackendCommunicationHandler {
         return new ArrayList<>();
     }
 
-    public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView(long uid, long timeout) {
+    public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView() {
         try {
             Socket socket = new Socket("127.0.0.1", 6789);
             Scanner tcpIn = new Scanner(socket.getInputStream());
