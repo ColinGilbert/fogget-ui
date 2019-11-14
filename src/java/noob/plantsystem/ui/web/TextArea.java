@@ -20,7 +20,7 @@ public class TextArea {
 
     boolean mistingInterval = false;
     boolean mistingDuration = false;
-    boolean statusUpdatePushInterval = false;
+    boolean statusPushInterval = false;
     boolean nutrientSolutionRatio = false;
     boolean lightsOntime = false;
     boolean lightsOffTime = false;
@@ -42,37 +42,38 @@ public class TextArea {
 
             results += "<input type=\"text\" name=\"";
             if (mistingInterval) {
-                results += "update misting interval\" id=\"misting-interval-\"";
+                results += ParameterNames.updateMistingInterval;
             }
             if (mistingDuration) {
-                results += "update misting duration\" id=\"misting-duration-\"";
+                results += ParameterNames.updateMistingDuration;
             }
-            if (statusUpdatePushInterval) {
-                results += "update status update push interval\" id=\"status-push-interval-\"";
+            if (statusPushInterval) {
+                results += ParameterNames.updateStatusPushInterval;
             }
             if (nutrientSolutionRatio) {
-                results += "update nutrient solution to water ratio\" id=\"nutrient-ratio-\"";
+                results += ParameterNames.updateNutrientSolutionRatio;
             }
             if (lightsOntime) {
-                results += "update lights-off time\" id=\"lights-off-time-\"";
+                results += ParameterNames.updateLightsOnTime;
             }
             if (lightsOffTime) {
-                results += "update lights-on time\" id=\"lights-on-time-\"";
+                results += ParameterNames.updateLightsOffTime;
             }
             if (targetUpperChamberTemperature) {
-                results += "update target upper chamber temperature\" id=\"target-upper-temperature-\"";
+                results += ParameterNames.updateTargetUpperChamberTemperature;
             }
             if (targetUpperChamberHumidity) {
-                results += "update target upper chamber humidity\" id=\"target-upper-humidity-\"";
+                results += ParameterNames.updateTargetUpperChamberHumidity;
             }
             if (targetLowerChamberTemperature) {
-                results += "update target lower chamber temperature\" id=\"target-lower-humidity-\"";
+                results += ParameterNames.updateTargetLowerChamberTemperature;
             }
             if (targetCO2PPM) {
-                results += "update target CO2 PPM\" id=\"target-co2-ppm-\"";
+                results += ParameterNames.updateTargetCO2PPM;
             }
+            results += "-";
             results += proxy.getUid();
-            results += " />";
+            results += "\" />";
             set = false;
         }
         return results;
@@ -94,11 +95,11 @@ public class TextArea {
         set = true;
     }
 
-    public void setStatusUpdatePushInterval() {
+    public void setStatusPushInterval() {
         if (!set) {
             reset();
         }
-        statusUpdatePushInterval = true;
+        statusPushInterval = true;
         set = true;
     }
 
@@ -161,7 +162,7 @@ public class TextArea {
     protected void reset() {
         mistingInterval = false;
         mistingDuration = false;
-        statusUpdatePushInterval = false;
+        statusPushInterval = false;
         nutrientSolutionRatio = false;
         lightsOffTime = false;
         lightsOntime = false;

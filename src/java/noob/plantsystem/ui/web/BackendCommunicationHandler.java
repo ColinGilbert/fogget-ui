@@ -112,28 +112,22 @@ public class BackendCommunicationHandler {
         return new TreeMap<>();
     }
 
-    public void sendControlInformation(List<PersistentArduinoState> state) {
-        /*
+    public void sendControlInformation(ArrayList<ArduinoConfigChangeRepresentation> arg) {
         MqttMessage message = new MqttMessage();
-        ArduinoConfigChangeRepresentation req = new ArduinoConfigChangeRepresentation();
-        req.setState(state);
-        req.setChangeSpecifications(specs);
+
         ObjectMapper mapper = new ObjectMapper();
         try {
-            message.setPayload(mapper.writeValueAsString(req).getBytes());
+            message.setPayload(mapper.writeValueAsString(arg).getBytes());
         } catch (JsonProcessingException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
+    return;
         }
         try {
             System.out.println(message.toString());
             client.publish(TopicStrings.stateControlRequest(), message);
         } catch (MqttException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
-            return false;
-
-        }
-         */
+        }     
     }
 
     protected MqttClient client;

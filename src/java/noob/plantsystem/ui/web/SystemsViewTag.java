@@ -27,18 +27,29 @@ public class SystemsViewTag extends SimpleTagSupport {
         writer.println("</tr>");
     }
 
+    protected TableCell booleanCell(boolean arg) {
+        TableCell c = new TableCell();
+        if (arg) {
+            c.setContents("Yes");
+        } else {
+            c.setContents("No");
+        }
+        return c;
+    }
+
     @Override
     public void doTag() throws JspException, IOException {
         JspWriter out = getJspContext().getOut();
         //out.println("<h1 style=\"color:#440000\">Bank of Colin.</h1><h3 style=\"color:#003300\">No refunds!</h3>");
         BackendCommunicationHandler backend = new BackendCommunicationHandler();
-        final int tableRows = 10;
+        //final int tableRows = 8;
         boolean connected = backend.connect();
         if (connected) {
             ArrayList<ArduinoProxy> systems = backend.getSystemsView();
             for (ArduinoProxy sys : systems) {
                 out.println("<table>");
                 TableCell cells[] = new TableCell[3];
+                final int tableRows = 7;
                 TextArea text = new TextArea(out, sys);
                 // Instantiate the objects
                 for (int i = 0; i < cells.length; i++) {
@@ -49,6 +60,9 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[i].setHeader(true);
                 }
                 // Print the header.
+                cells[0].setColSpan(3);
+                cells[2].setColSpan(4);
+                //
                 cells[0].setContents("Property");
                 cells[1].setContents("Value");
                 cells[2].setContents("Update to");
@@ -71,8 +85,8 @@ public class SystemsViewTag extends SimpleTagSupport {
                 printRow(out, cells);
                 // Print the status push interval
                 cells[0].setContents("Status push interval: ");//sys.getStatusPushUpdateInterval())
-                cells[1].setContents(sys.getStatusUpdatePushInterval() + "ms");
-                text.setStatusUpdatePushInterval();
+                cells[1].setContents(sys.getStatusPushInterval() + "ms");
+                text.setStatusPushInterval();
                 cells[2].setContents(text.toString());
                 printRow(out, cells);
                 // Nutrients to water feed ratio
@@ -93,9 +107,21 @@ public class SystemsViewTag extends SimpleTagSupport {
                 text.setLightsOffTime();
                 cells[2].setContents(text.toString());
                 printRow(out, cells);
+                // Current upper chamber humidity
+                cells[0].setContents("Current upper chamber humidity");
+                cells[1].setContents(Float.toString(sys.getCurrentUpperChamberHumidity()));
+                text.setTargetUpperChamberHumidity();
+                cells[2].setContents(text.toString());
+                printRow(out, cells);
                 // Target upper chamber humidity
                 cells[0].setContents("Target upper chamber humidity");
                 cells[1].setContents(Float.toString(sys.getTargetUpperChamberHumidity()));
+                text.setTargetUpperChamberHumidity();
+                cells[2].setContents(text.toString());
+                printRow(out, cells);
+                // Current upper chamber temperature
+                cells[0].setContents("Current upper chamber temperature");
+                cells[1].setContents(Float.toString(sys.getCurrentUpperChamberTemperature()));
                 text.setTargetUpperChamberHumidity();
                 cells[2].setContents(text.toString());
                 printRow(out, cells);
@@ -105,19 +131,72 @@ public class SystemsViewTag extends SimpleTagSupport {
                 text.setTargetUpperChamberTemperature();
                 cells[2].setContents(text.toString());
                 printRow(out, cells);
+                // Current CO2 PPM
+                cells[0].setContents("Current CO2 PPM");
+                cells[1].setContents(Long.toString(sys.getCurrentCO2PPM()));
+                text.setTargetCO2PPM();
+                cells[2].setContents(text.toString());
+                printRow(out, cells);                
                 // Target CO2 PPM
                 cells[0].setContents("Target CO2 PPM");
                 cells[1].setContents(Long.toString(sys.getTargetCO2PPM()));
                 text.setTargetCO2PPM();
                 cells[2].setContents(text.toString());
                 printRow(out, cells);
+                // Now, we do the rows with all the boolean values.
+                cells = new TableCell[1];
+                cells[0] = new TableCell();
+                cells[0].setHeader(true);
+                cells[0].setColSpan(tableRows);
+                cells[0].setContents("Machinery status");
+                printRow(out, cells);
+                cells = new TableCell[10];
+                for (int i = 0; i < cells.length; i++) {
+                    cells[i] = new TableCell();
+                }
+                cells[0].setContents("Power");
+                cells[1].setContents("Lights");
+                cells[2].setContents("Fogging");
+                cells[3].setContents("Locked");
+                cells[4].setContents("Doors Open");
+                cells[5].setContents("Dehumidifying");
+                cells[6].setContents("Cooling");
+                cells[7].setContents("Injecting CO2");
+                printRow(out, cells);
+                
+                cells[0] = booleanCell(sys.isPowered());
+                cells[1] = booleanCell(sys.isLit());
+                cells[2] = booleanCell(sys.isMisting());
+                cells[3] = booleanCell(sys.isLocked());
+                cells[4] = booleanCell(sys.isOpen());
+                cells[5] = booleanCell(sys.isDehumidifying());
+                cells[6] = booleanCell(sys.isCooling());
+                cells[7] = booleanCell(sys.isInjectingCO2());
+                printRow(out, cells);
+                /*
+                            public long getTimestamp();
+    public float getReservoirLevel();   
+   public float getNutrientSolutionLevel();
+        public boolean isPowered();
+    public boolean isLit(); 
+    public boolean isMisting();
+       public boolean isLocked();
+    public boolean isOpen();    
+    public long getTimeLeftUnlocked();    
+    public float getUpperChamberHumidity();    
+    public float getUpperChamberTemperature();    
+    public float getLowerChamberTemperature();    
+    public int getCurrentCO2PPM();    
+    public boolean isDehumidifying();    
+    public boolean isCooling();    
+    public boolean isInjectingCO2(); */
             }
             out.println("</table>");
         } else { // Print error message for user.
-                out.println("Could not connect to backend. :(");
+            out.println("Could not connect to backend. :(");
         }
     }
-    }
+}
     /*            <th>Property</th>
                     <th>Value</th>
                     <th>Update value (if applicable)</th>
