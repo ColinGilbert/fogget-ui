@@ -9,8 +9,8 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.ArrayDeque" %>
 <%@ page import="noob.plantsystem.common.EventRecord" %>
-        
 
+<%@ taglib prefix="noob" uri="WEB-INF/tlds/fogget-tags.tld"%>
 <%@ page import="noob.plantsystem.ui.web.BackendCommunicationHandler" %>
 <%@ page import="noob.plantsystem.common.ArduinoProxy" %>
 
@@ -22,17 +22,11 @@
         <title>Fogget-About-It-Grow-System</title>
     </head>
     <body>
-        <h1>Plant growth cluster management system web interface.</h1>
-        <p>
-            <%
-                BackendCommunicationHandler backend = new BackendCommunicationHandler();
-                boolean connected = backend.connect();
-                if (connected) {
-                    ArrayList<ArduinoProxy> systems = backend.getSystemsView();
-                    out.print(systems);
-                   // TreeMap<Long, ArrayDeque<EventRecord>> events = backend.getEventsView();
-                }
-            %>
-        </p>
+        <h3>Plant growth cluster management system web interface.</h3>
+        <form name="config-changer" action="ControllerServlet">
+            <input type="submit">
+            <noob:SystemsView/>
+            <input type="submit">
+        </form>
     </body>
 </html>
