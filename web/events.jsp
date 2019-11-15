@@ -1,6 +1,6 @@
 <%-- 
-    Document   : index
-    Created on : Oct 23, 2019, 10:55:13 PM
+    Document   : eventview
+    Created on : Nov 11, 2019, 9:01:30 PM
     Author     : noob
 --%>
 
@@ -11,7 +11,6 @@
 <%@ page import="noob.plantsystem.common.EventRecord" %>
 <%@ page import="noob.plantsystem.ui.web.BackendCommunicationHandler" %>
 <%@ page import="noob.plantsystem.common.ArduinoProxy" %>
-
 <%@ taglib prefix="noob" uri="WEB-INF/tlds/fogget-tags.tld"%>
 
 
@@ -23,10 +22,9 @@
     </head>
     <body>
         <h3>Plant growth cluster management system web interface.</h3>
-        <form name="config-changer" action="ControllerServlet">
-            <input type="submit">
-            <noob:SystemsView/>
-            <input type="submit">
-        </form>
+        <a href="index.jsp" >Go back</a>
+        <noob:EventsView uid=""/>
+        <a href="index.jsp" >Go back</a>
+
     </body>
 </html>

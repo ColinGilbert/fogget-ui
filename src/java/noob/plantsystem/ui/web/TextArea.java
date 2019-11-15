@@ -16,30 +16,33 @@ import javax.servlet.jsp.JspWriter;
 public class TextArea {
 
     JspWriter writer;
-    ArduinoProxy proxy;
-
+    //ArduinoProxy proxy;
     boolean mistingInterval = false;
     boolean mistingDuration = false;
     boolean statusPushInterval = false;
     boolean nutrientSolutionRatio = false;
-    boolean lightsOntime = false;
-    boolean lightsOffTime = false;
+    boolean lightsOnHour = false;
+    boolean lightsOnMinute = false;
+    boolean lightsOffHour = false;
+    boolean lightsOffMinute = false;
     boolean targetUpperChamberTemperature = false;
     boolean targetUpperChamberHumidity = false;
     boolean targetLowerChamberTemperature = false;
     boolean targetCO2PPM = false;
+    boolean description = false;
     boolean set = false;
-
-    public TextArea(JspWriter writer, ArduinoProxy proxy) {
+    int size = 0;
+    long uid = 0;
+    
+    public TextArea(JspWriter writer, long uidArg) {
         this.writer = writer;
-        this.proxy = proxy;
+        uid = uidArg;
     }
 
     @Override
     public String toString() {
         String results = "";
         if (set) {
-
             results += "<input type=\"text\" name=\"";
             if (mistingInterval) {
                 results += ParameterNames.updateMistingInterval;
@@ -53,12 +56,18 @@ public class TextArea {
             if (nutrientSolutionRatio) {
                 results += ParameterNames.updateNutrientSolutionRatio;
             }
-            if (lightsOntime) {
-                results += ParameterNames.updateLightsOnTime;
+            if (lightsOnHour) {
+                results += ParameterNames.updateLightsOnHour;
             }
-            if (lightsOffTime) {
-                results += ParameterNames.updateLightsOffTime;
+            if (lightsOnMinute) {
+                results += ParameterNames.updateLightsOnMinute;
             }
+            if (lightsOffHour) {
+                results += ParameterNames.updateLightsOffHour;
+            }
+            if (lightsOffMinute) {
+                results += ParameterNames.updateLightsOffMinute;
+            }            
             if (targetUpperChamberTemperature) {
                 results += ParameterNames.updateTargetUpperChamberTemperature;
             }
@@ -71,12 +80,26 @@ public class TextArea {
             if (targetCO2PPM) {
                 results += ParameterNames.updateTargetCO2PPM;
             }
+            if (description) {
+                results += ParameterNames.description;
+            }            
             results += "-";
-            results += proxy.getUid();
-            results += "\" />";
+            results += uid;
+            results += "\" ";            
+            if (size > 0) {
+                
+                results += "size=\"";
+                results += size;
+                results += "\" ";
+            }      
+            results += " />";
             set = false;
         }
         return results;
+    }
+    
+    public void setSize(int arg) {
+        size = Math.abs(arg);
     }
 
     public void setMistingInterval() {
@@ -111,19 +134,35 @@ public class TextArea {
         set = true;
     }
 
-    public void setLightsOnTime() {
+    public void setLightsOnHour() {
         if (!set) {
             reset();
         }
-        lightsOntime = true;
+        lightsOnHour = true;
         set = true;
     }
 
-    public void setLightsOffTime() {
+    public void setLightsOnMinute() {
         if (!set) {
             reset();
         }
-        lightsOffTime = true;
+        lightsOnHour = true;
+        set = true;
+    }
+
+    public void setLightsOffHour() {
+        if (!set) {
+            reset();
+        }
+        lightsOffMinute = true;
+        set = true;
+    }    
+        
+    public void setLightsOffMinute() {
+        if (!set) {
+            reset();
+        }
+        lightsOffMinute = true;
         set = true;
     }
 
@@ -150,7 +189,7 @@ public class TextArea {
         targetLowerChamberTemperature = true;
         set = true;
     }
-
+    
     public void setTargetCO2PPM() {
         if (!set) {
             reset();
@@ -159,17 +198,30 @@ public class TextArea {
         set = true;
     }
 
+    public void setDescription() {
+        if (!set) {
+            reset();
+        }
+        description = true;
+        set = true;
+    }
+    
     protected void reset() {
         mistingInterval = false;
         mistingDuration = false;
         statusPushInterval = false;
         nutrientSolutionRatio = false;
-        lightsOffTime = false;
-        lightsOntime = false;
+        lightsOffHour = false;
+        lightsOffMinute = false;
+        lightsOnHour = false;
+        lightsOffMinute = false;
         targetUpperChamberTemperature = false;
         targetUpperChamberHumidity = false;
         targetLowerChamberTemperature = false;
         targetCO2PPM = false;
+        description = false;
         set = false;
+        size = 0;
+        uid = 0;       
     }
 }

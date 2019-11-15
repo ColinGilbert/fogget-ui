@@ -19,9 +19,13 @@ public class ParameterNames {
 
     static public final String updateNutrientSolutionRatio = "updateNutrientSolutionRatio";
 
-    static public final String updateLightsOffTime = "updateLightsOffTime";
+    static public final String updateLightsOnHour = "updateLightsOnHour";
 
-    static public final String updateLightsOnTime = "updateLightsOnTime";
+    static public final String updateLightsOnMinute = "updateLightsOnMinute";
+
+    static public final String updateLightsOffHour = "updateLightsOffHour";
+
+    static public final String updateLightsOffMinute = "updateLightsOffMinute";
 
     static public final String updateTargetUpperChamberHumidity = "updateTargetUpperChamberHumidity";
 
@@ -30,5 +34,7 @@ public class ParameterNames {
     static public final String updateTargetLowerChamberTemperature = "updateTargetLowerChamberTemperature";
 
     static public final String updateTargetCO2PPM = "updateTargetCO2PPM";
+    
+    static public final String description = "description"; 
 
 }

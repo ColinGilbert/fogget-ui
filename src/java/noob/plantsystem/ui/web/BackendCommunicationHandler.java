@@ -57,6 +57,8 @@ import java.util.TreeMap;
  */
 public class BackendCommunicationHandler {
 
+    protected int port = 6777;
+
     public boolean connect() {
         MqttConnectOptions connectionOptions = new MqttConnectOptions();
         connectionOptions.setCleanSession(true); // We want the broker to remember past subscriptions.
@@ -77,32 +79,51 @@ public class BackendCommunicationHandler {
         return true;
     }
 
-    public ArrayList<ArduinoProxy> getSystemsView() {
+    public TreeMap<Long, String> getSystemDescriptionsView() {
         try {
-            Socket socket = new Socket("127.0.0.1", 6777);
+            Socket socket = new Socket("127.0.0.1", port);
             Scanner tcpIn = new Scanner(socket.getInputStream());
             PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GET");           
+            tcpOut.println("GETPROXIES");
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("Systems view response : " + response);
-            return mapper.readValue(response, new TypeReference<ArrayList<ArduinoProxy>>() {} );
+            return mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
+            });
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new ArrayList<>();
+        return new TreeMap<>();
+    }
+
+    public TreeMap<Long, ArduinoProxy> getSystemsView() {
+        try {
+            Socket socket = new Socket("127.0.0.1", port);
+            Scanner tcpIn = new Scanner(socket.getInputStream());
+            PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
+            tcpOut.println("GETPROXIES");
+            String response = tcpIn.nextLine();
+            ObjectMapper mapper = new ObjectMapper();
+            System.out.println("Systems view response : " + response);
+            return mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return new TreeMap<>();
     }
 
     public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView() {
         try {
-            Socket socket = new Socket("127.0.0.1", 6789);
+            Socket socket = new Socket("127.0.0.1", port);
             Scanner tcpIn = new Scanner(socket.getInputStream());
             PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GET");
+            tcpOut.println("GETEVENTS");
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("Events view response: " + response);
-            return mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {});
+            return mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
+            });
             // out.println(scanner.nextLine());
             // System.out.println(tcpIn.nextLine());
 
@@ -120,20 +141,18 @@ public class BackendCommunicationHandler {
             message.setPayload(mapper.writeValueAsString(arg).getBytes());
         } catch (JsonProcessingException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
-    return;
+            return;
         }
         try {
             System.out.println(message.toString());
             client.publish(TopicStrings.stateControlRequest(), message);
         } catch (MqttException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
-        }     
+        }
     }
 
     protected MqttClient client;
 
     TreeMap<Long, ArrayDeque<EventRecord>> eventsViewData = new TreeMap<>();
     ArrayList<ArduinoProxy> systemsViewData = new ArrayList<>();
-///    protected HashMap<Long, ArrayDeque<EventRecord>> events;
-//    protected HashMap<Long, ArduinoProxy> systems;
 }

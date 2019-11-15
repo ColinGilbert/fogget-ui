@@ -40,21 +40,6 @@ public class ControllerServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        PrintWriter out = response.getWriter();
-        /*
-    private boolean changingMistingInterval = false;
-    private boolean changingMistingDuration = false;
-    private boolean changingStatusPushInterval = false;
-        
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-    private boolean  = false;
-         */
         BackendCommunicationHandler backend = new BackendCommunicationHandler();
 
         boolean connected = backend.connect();
@@ -73,80 +58,146 @@ public class ControllerServlet extends HttpServlet {
 
                     Matcher match = pattern.matcher(splitParamName[1]);
                     if (match.find()) { // If the latter half of our parameter name is only numeric
-                        System.out.println("Got proper param names for element ." + splitParamName[0]);
-
+                        System.out.println("Got proper params for machine " + splitParamName[1]);
+                        long timeOffAccumulator = 0;
+                        long timeOnAccumulator = 0;
+                        boolean changingOffTime = false;
+                        boolean changingOnTime = false;
                         String[] paramValues = request.getParameterValues(fullParamName);
                         ArduinoConfigChangeRepresentation configChange = new ArduinoConfigChangeRepresentation();
-                        for (int i = 0; i < paramValues.length; i++) {
-                            String paramValue = paramValues[i];
+                        for (String paramValue : paramValues) {
                             if (!"".equals(paramValue)) { // If we actually have a parameter to send to our backend
                                 final String firstPart = splitParamName[0];
                                 try {
                                     configChange.setUid(Long.parseLong(splitParamName[1]));
-                                    switch (firstPart) {
-
-                                        case (ParameterNames.updateMistingInterval): {
-                                            configChange.setMistingInterval(Integer.parseInt(paramValue));
-                                            configChange.setChangingMistingInterval(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateMistingDuration): {
-                                            configChange.setMistingDuration(Integer.parseInt(paramValue));
-                                            configChange.setChangingMistingDuration(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateStatusPushInterval): {
-                                            configChange.setStatusPushInterval(Integer.parseInt(paramValue));
-                                            configChange.setChangingStatusPushInterval(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateNutrientSolutionRatio): {
-                                            configChange.setNutrientSolutionRatio(Float.parseFloat(paramValue));
-                                            configChange.setChangingNutrientSolutionRatio(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateLightsOffTime): {
-                                            configChange.setLightsOffTime(Long.parseLong(paramValue));
-                                            configChange.setChangingLightsOffTime(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateLightsOnTime): {
-                                            configChange.setLightsOnTime(Long.parseLong(paramValue));
-                                            configChange.setChangingLightsOnTime(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateTargetUpperChamberHumidity): {
-                                            configChange.setTargetUpperChamberHumidity(Float.parseFloat(paramValue));
-                                            configChange.setChangingTargetUpperChamberHumidity(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateTargetUpperChamberTemperature): {
-                                            configChange.setTargetUpperChamberTemperature(Float.parseFloat(paramValue));
-                                            configChange.setChangingTargetUpperChamberTemperature(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateTargetLowerChamberTemperature): {
-                                            configChange.setTargetLowerChamberTemperature(Float.parseFloat(paramValue));
-                                            configChange.setChangingTargetLowerChamberTemperature(true);
-                                            break;
-                                        }
-                                        case (ParameterNames.updateTargetCO2PPM): {
-                                            configChange.setTargetCO2PPM(Integer.parseInt(paramValue));
-                                            configChange.setChangingTargetCO2PPM(true);
-                                            break;
-                                        }
-                                        default: {
-                                            System.out.println("Invalid parameter name in ControllerServlet: " + firstPart);
-                                        }
-                                    }
                                 } catch (NumberFormatException ex) {
                                     Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                                    break;
+                                }
+                                switch (firstPart) {
+                                    case (ParameterNames.updateMistingInterval): {
+                                        try {
+                                            configChange.setMistingInterval(Integer.parseInt(paramValue));
+                                            configChange.setChangingMistingInterval(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateMistingDuration): {
+                                        try {
+                                            configChange.setMistingDuration(Integer.parseInt(paramValue));
+                                            configChange.setChangingMistingDuration(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateStatusPushInterval): {
+                                        try {
+                                            configChange.setStatusPushInterval(Integer.parseInt(paramValue));
+                                            configChange.setChangingStatusPushInterval(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateNutrientSolutionRatio): {
+                                        try {
+                                            configChange.setNutrientSolutionRatio(Float.parseFloat(paramValue));
+                                            configChange.setChangingNutrientSolutionRatio(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateLightsOffHour): {
+                                        try {
+                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
+                                            // configChange.setChangingLightsOffTime(true);
+                                            timeOffAccumulator += 3600000 * Long.parseLong(paramValue);
+                                            changingOffTime = true;
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateLightsOffMinute): {
+                                        try {
+                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
+                                            // configChange.setChangingLightsOffTime(true);
+                                            timeOffAccumulator += 60000 * Long.parseLong(paramValue);
+                                            changingOffTime = true;
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateLightsOnHour): {
+                                        try {
 
+                                            timeOnAccumulator += 3600000 * Long.parseLong(paramValue);
+                                            changingOnTime = true;
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateLightsOnMinute): {
+                                        try {
+                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
+                                            // configChange.setChangingLightsOffTime(true);
+                                            timeOnAccumulator += 60000 * Long.parseLong(paramValue);
+                                            changingOnTime = true;
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateTargetUpperChamberHumidity): {
+                                        try {
+                                            configChange.setTargetUpperChamberHumidity(Float.parseFloat(paramValue));
+                                            configChange.setChangingTargetUpperChamberHumidity(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateTargetUpperChamberTemperature): {
+                                        try {
+                                            configChange.setTargetUpperChamberTemperature(Float.parseFloat(paramValue));
+                                            configChange.setChangingTargetUpperChamberTemperature(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateTargetLowerChamberTemperature): {
+                                        try {
+                                            configChange.setTargetLowerChamberTemperature(Float.parseFloat(paramValue));
+                                            configChange.setChangingTargetLowerChamberTemperature(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    case (ParameterNames.updateTargetCO2PPM): {
+                                        try {
+                                            configChange.setTargetCO2PPM(Integer.parseInt(paramValue));
+                                            configChange.setChangingTargetCO2PPM(true);
+                                        } catch (NumberFormatException ex) {
+                                        }
+                                        break;
+                                    }
+                                    default: {
+                                        System.out.println("Invalid parameter name in ControllerServlet: " + firstPart);
+                                    }
+                                }
+                                if (changingOffTime) {
+                                    configChange.setLightsOffTime(Long.parseLong(paramValue));
+                                    configChange.setChangingLightsOffTime(true);
+                                }
+                                if (changingOnTime) {
+                                    configChange.setLightsOnTime(Long.parseLong(paramValue));
+                                    configChange.setChangingLightsOnTime(true);
                                 }
                                 // TODO: Check if some params have more than one value
                             }
                         }
-                        sentToBackend.add(configChange);
+                        if (configChange.hasChanges()) {
+                            sentToBackend.add(configChange);
+                        } else {
+                            System.out.println("Trying to add invalid state changer");
+                        }
                     }
                 }
             }

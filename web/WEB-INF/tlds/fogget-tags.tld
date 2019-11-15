@@ -8,6 +8,16 @@
     <tag-class>noob.plantsystem.ui.web.SystemsViewTag</tag-class>
     <body-content>scriptless</body-content>
   </tag>
+    <tag>
+    <name>EventsView</name>
+    <tag-class>noob.plantsystem.ui.web.EventsViewTag</tag-class>
+    <attribute>
+        <name>uid</name>
+        <required>true</required>
+        <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <body-content>scriptless</body-content>
+  </tag>
   <!-- A validator verifies that the tags are used correctly at JSP
           translation time. Validator entries look like this: 
        <validator>
