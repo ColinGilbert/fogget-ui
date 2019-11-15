@@ -37,25 +37,18 @@ public class ControllerServlet extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         BackendCommunicationHandler backend = new BackendCommunicationHandler();
-
         boolean connected = backend.connect();
         if (connected) {
-
             Pattern pattern = Pattern.compile("^[0-9]+$"); // Only numerics
             Enumeration<String> parameterNames = request.getParameterNames();
-
             ArrayList<ArduinoConfigChangeRepresentation> sentToBackend = new ArrayList<>();
-
             while (parameterNames.hasMoreElements()) {
-
                 String fullParamName = parameterNames.nextElement();
                 String splitParamName[] = fullParamName.split("-");
                 if (splitParamName.length > 1) { // If we actually have a multipart parameter name, as we should
-
                     Matcher match = pattern.matcher(splitParamName[1]);
                     if (match.find()) { // If the latter half of our parameter name is only numeric
                         System.out.println("Got proper params for machine " + splitParamName[1]);
@@ -201,16 +194,13 @@ public class ControllerServlet extends HttpServlet {
                     }
                 }
             }
-
             // out.close();
             // setConfigValues
             if (sentToBackend.size() > 0) {
                 backend.sendControlInformation(sentToBackend);
                 System.out.println("Sent message to backend.");
             }
-
         }
-
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
         dispatcher.forward(request, response);
     }

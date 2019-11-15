@@ -84,7 +84,7 @@ public class BackendCommunicationHandler {
             Socket socket = new Socket("127.0.0.1", port);
             Scanner tcpIn = new Scanner(socket.getInputStream());
             PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GETPROXIES");
+            tcpOut.println("GETDESCRIPTIONS");
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("Systems view response : " + response);

@@ -221,7 +221,5 @@ public class TextArea {
         targetCO2PPM = false;
         description = false;
         set = false;
-        size = 0;
-        uid = 0;       
     }
 }

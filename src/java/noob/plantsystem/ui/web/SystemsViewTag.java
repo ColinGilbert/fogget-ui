@@ -47,7 +47,6 @@ public class SystemsViewTag extends SimpleTagSupport {
         if (connected) {
             TreeMap<Long, ArduinoProxy> systems = backend.getSystemsView();
             TreeMap<Long, String> descriptions = backend.getSystemDescriptionsView();
-            
             for (ArduinoProxy sys : systems.values()) {
                 int firstColSpan = 2;
                 out.println("<table>");
@@ -121,11 +120,11 @@ public class SystemsViewTag extends SimpleTagSupport {
                 // Lights-on time
                 cells[0].setContents("Lights-On time");
                 cells[1].setContents(Long.toString(sys.getLightsOnTime()));
-                String cellStr = "H:";
+                String cellStr = "Hours:";
                 textArea.setSize(2);
                 textArea.setLightsOnHour();
                 cellStr += textArea.toString();
-                cellStr += " M:";
+                cellStr += " Minutes:";
                 textArea.setLightsOnMinute();
                 cellStr += textArea.toString();
                 cells[2].setContents(cellStr);
@@ -134,10 +133,10 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cells[0].setContents("Lights-Off time");
                 cells[1].setContents(Long.toString(sys.getLightsOffTime()));
                 textArea.setLightsOffHour();
-                cellStr = "H:";
+                cellStr = "Hours: ";
                 cellStr += textArea.toString();
                 textArea.setLightsOffMinute();
-                cellStr += " M:";
+                cellStr += " Minutes: ";
                 cellStr += textArea.toString();
                 cells[2].setContents(textArea.toString());
                 printRow(out, cells);
