@@ -87,9 +87,10 @@ public class BackendCommunicationHandler {
             tcpOut.println("GETDESCRIPTIONS");
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
-            System.out.println("Systems view response : " + response);
-            return mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
+            System.out.println("Descriptions view response : " + response);
+            TreeMap<Long, String> results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
             });
+            return results;
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -124,8 +125,6 @@ public class BackendCommunicationHandler {
             System.out.println("Events view response: " + response);
             return mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
             });
-            // out.println(scanner.nextLine());
-            // System.out.println(tcpIn.nextLine());
 
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -135,7 +134,6 @@ public class BackendCommunicationHandler {
 
     public void sendControlInformation(ArrayList<ArduinoConfigChangeRepresentation> arg) {
         MqttMessage message = new MqttMessage();
-
         ObjectMapper mapper = new ObjectMapper();
         try {
             message.setPayload(mapper.writeValueAsString(arg).getBytes());
@@ -151,6 +149,24 @@ public class BackendCommunicationHandler {
         }
     }
 
+        public void sendSystemDescriptionUpdate(TreeMap<Long, String> descriptions) {
+       MqttMessage message = new MqttMessage();
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            message.setPayload(mapper.writeValueAsString(descriptions).getBytes());
+        } catch (JsonProcessingException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return;
+        }
+        try {
+            System.out.println(message.toString());
+            client.publish(TopicStrings.descriptionsUpdateRequest(), message);
+        } catch (MqttException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    
     protected MqttClient client;
 
     TreeMap<Long, ArrayDeque<EventRecord>> eventsViewData = new TreeMap<>();

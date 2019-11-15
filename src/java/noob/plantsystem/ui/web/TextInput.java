@@ -13,7 +13,7 @@ import javax.servlet.jsp.JspWriter;
  *
  * @author noob
  */
-public class TextArea {
+public class TextInput {
 
     JspWriter writer;
     //ArduinoProxy proxy;
@@ -31,19 +31,42 @@ public class TextArea {
     boolean targetCO2PPM = false;
     boolean description = false;
     boolean set = false;
-    int size = 0;
+    int width = 0;
+    int height = 0;
     long uid = 0;
-    
-    public TextArea(JspWriter writer, long uidArg) {
+
+    public TextInput(JspWriter writer, long uidArg) {
         this.writer = writer;
         uid = uidArg;
     }
 
     @Override
     public String toString() {
+        boolean isArea = false;
         String results = "";
         if (set) {
-            results += "<input type=\"text\" name=\"";
+            if (height < 2) {
+                results += "<input type=\"text\" ";
+                if (width > 0) {
+                    results += "size=\"";
+                    results += width;
+                    results += "\" ";
+                }
+            } else {
+                isArea = true;
+                results += "<textarea ";
+                if (height > 0) {
+                    results += "rows=\"";
+                    results += height;
+                    results += "\" ";
+                    if (width > 0) {
+                        results += "cols=\"";
+                        results += width;
+                        results += "\"";
+                    }
+                }
+            }
+            results += " name=\"";
             if (mistingInterval) {
                 results += ParameterNames.updateMistingInterval;
             }
@@ -67,7 +90,7 @@ public class TextArea {
             }
             if (lightsOffMinute) {
                 results += ParameterNames.updateLightsOffMinute;
-            }            
+            }
             if (targetUpperChamberTemperature) {
                 results += ParameterNames.updateTargetUpperChamberTemperature;
             }
@@ -81,25 +104,29 @@ public class TextArea {
                 results += ParameterNames.updateTargetCO2PPM;
             }
             if (description) {
-                results += ParameterNames.description;
-            }            
+                results += ParameterNames.updateDescription;
+            }
             results += "-";
             results += uid;
-            results += "\" ";            
-            if (size > 0) {
-                
-                results += "size=\"";
-                results += size;
-                results += "\" ";
-            }      
+            results += "\" ";
+            if (!isArea)
+            {
             results += " />";
+            }
+            else {
+                results += "></textArea>";
+            }
             set = false;
         }
         return results;
     }
-    
-    public void setSize(int arg) {
-        size = Math.abs(arg);
+
+    public void setWidth(int arg) {
+        width = Math.abs(arg);
+    }
+
+    public void setHeight(int arg) {
+        height = Math.abs(arg);
     }
 
     public void setMistingInterval() {
@@ -156,8 +183,8 @@ public class TextArea {
         }
         lightsOffMinute = true;
         set = true;
-    }    
-        
+    }
+
     public void setLightsOffMinute() {
         if (!set) {
             reset();
@@ -189,7 +216,7 @@ public class TextArea {
         targetLowerChamberTemperature = true;
         set = true;
     }
-    
+
     public void setTargetCO2PPM() {
         if (!set) {
             reset();
@@ -205,7 +232,7 @@ public class TextArea {
         description = true;
         set = true;
     }
-    
+
     protected void reset() {
         mistingInterval = false;
         mistingDuration = false;

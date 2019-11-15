@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -26,7 +27,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
  *
  * @author noob
  */
-public class ControllerServlet extends HttpServlet {
+public class StatePushControllerServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -45,6 +46,8 @@ public class ControllerServlet extends HttpServlet {
             Pattern pattern = Pattern.compile("^[0-9]+$"); // Only numerics
             Enumeration<String> parameterNames = request.getParameterNames();
             ArrayList<ArduinoConfigChangeRepresentation> sentToBackend = new ArrayList<>();
+            boolean changingDescriptions = false;
+            TreeMap<Long, String> descriptionsToChange = new TreeMap<>();
             while (parameterNames.hasMoreElements()) {
                 String fullParamName = parameterNames.nextElement();
                 String splitParamName[] = fullParamName.split("-");
@@ -56,15 +59,22 @@ public class ControllerServlet extends HttpServlet {
                         long timeOnAccumulator = 0;
                         boolean changingOffTime = false;
                         boolean changingOnTime = false;
+                        long uid;
                         String[] paramValues = request.getParameterValues(fullParamName);
                         ArduinoConfigChangeRepresentation configChange = new ArduinoConfigChangeRepresentation();
                         for (String paramValue : paramValues) {
                             if (!"".equals(paramValue)) { // If we actually have a parameter to send to our backend
                                 final String firstPart = splitParamName[0];
                                 try {
-                                    configChange.setUid(Long.parseLong(splitParamName[1]));
+                                    uid = Long.parseLong(splitParamName[1]);
                                 } catch (NumberFormatException ex) {
-                                    Logger.getLogger(ControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                                    Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
+                                    continue;
+                                }
+                                try {
+                                    configChange.setUid(uid);
+                                } catch (NumberFormatException ex) {
+                                    Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                     break;
                                 }
                                 switch (firstPart) {
@@ -171,8 +181,18 @@ public class ControllerServlet extends HttpServlet {
                                         }
                                         break;
                                     }
+                                    case (ParameterNames.updateDescription): {
+                                        try {
+                                            descriptionsToChange.put(uid, paramValue);
+                                            changingDescriptions = true;
+                                        } catch (NumberFormatException ex) {
+                                            changingDescriptions = true;
+                                        }
+                                        break;
+                                    }
+
                                     default: {
-                                        System.out.println("Invalid parameter name in ControllerServlet: " + firstPart);
+                                        System.out.println("Invalid parameter name: " + firstPart);
                                     }
                                 }
                                 if (changingOffTime) {
@@ -183,6 +203,7 @@ public class ControllerServlet extends HttpServlet {
                                     configChange.setLightsOnTime(Long.parseLong(paramValue));
                                     configChange.setChangingLightsOnTime(true);
                                 }
+
                                 // TODO: Check if some params have more than one value
                             }
                         }
@@ -191,6 +212,7 @@ public class ControllerServlet extends HttpServlet {
                         } else {
                             System.out.println("Trying to add invalid state changer");
                         }
+
                     }
                 }
             }
@@ -200,8 +222,12 @@ public class ControllerServlet extends HttpServlet {
                 backend.sendControlInformation(sentToBackend);
                 System.out.println("Sent message to backend.");
             }
+            if (changingDescriptions) {
+                backend.sendSystemDescriptionUpdate(descriptionsToChange);
+            }
         }
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher("/index.jsp");
+
         dispatcher.forward(request, response);
     }
 

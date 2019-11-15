@@ -23,10 +23,9 @@
     </head>
     <body>
         <h3>Plant growth cluster management system web interface.</h3>
+        <p>This is where you view the overall state of your machine network and put in your setting changes.</p>
         <form name="config-changer" action="ControllerServlet">
-            <input type="submit">
             <noob:SystemsView/>
-            <input type="submit">
         </form>
     </body>
 </html>

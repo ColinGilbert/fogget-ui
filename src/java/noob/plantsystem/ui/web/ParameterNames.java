@@ -35,6 +35,6 @@ public class ParameterNames {
 
     static public final String updateTargetCO2PPM = "updateTargetCO2PPM";
     
-    static public final String description = "description"; 
+    static public final String updateDescription = "updateDescription"; 
 
 }
