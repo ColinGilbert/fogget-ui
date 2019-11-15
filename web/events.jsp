@@ -22,9 +22,9 @@
     </head>
     <body>
         <h3>Plant growth cluster management system web interface.</h3>
-        <a href="index.jsp" >Go back</a>
-        <noob:EventsView uid=""/>
-        <a href="index.jsp" >Go back</a>
+        <p><a href="index.jsp" >Go back</a></p>
+        <noob:EventsView uid="<%= request.getParameter("uid") %>"/>
+        <p><a href="index.jsp" >Go back</a></p>
 
     </body>
 </html>

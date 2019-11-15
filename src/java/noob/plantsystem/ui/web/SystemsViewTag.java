@@ -42,9 +42,7 @@ public class SystemsViewTag extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
         JspWriter out = getJspContext().getOut();
-        //out.println("<h1 style=\"color:#440000\">Bank of Colin.</h1><h3 style=\"color:#003300\">No refunds!</h3>");
         BackendCommunicationHandler backend = new BackendCommunicationHandler();
-        //final int tableRows = 8;
         boolean connected = backend.connect();
         if (connected) {
             TreeMap<Long, ArduinoProxy> systems = backend.getSystemsView();
@@ -216,7 +214,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[i] = c;//new TableCell();
                 }
                 cells[0].setColSpan(horizSpan);
-                cellStr = "<a href=\"events.jsp?uid=\"";
+                cellStr = "<a href=\"events.jsp?uid=";
                 cellStr += sys.getUid();
                 cellStr += "\"> View events for this system.</a>";
                 cells[0].setContents(cellStr);
