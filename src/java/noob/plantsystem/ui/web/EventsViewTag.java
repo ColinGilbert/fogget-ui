@@ -6,6 +6,7 @@
 package noob.plantsystem.ui.web;
 
 import java.io.IOException;
+import java.sql.Time;
 import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.TreeMap;
@@ -80,13 +81,13 @@ public class EventsViewTag extends SimpleTagSupport {
         TreeMap<Long, ArrayDeque<EventRecord>> allEvents = backend.getEventsView();
         if (allEvents.containsKey(uidLocal)) {
             for (EventRecord event : allEvents.get(uidLocal)) {
-                Date date = new Date(event.getTimestamp());
+                Date date = new Time(event.getTimestamp());
                 cells[0].setContents(date.toString());
                 String eventDescriptionResult = eventDescriptions.getDescription(event.getEvent()).getValue();
                     eventDescriptionResult = eventDescriptionResult.replaceAll("_", " ");
                     cells[1].setContents(eventDescriptionResult.toLowerCase());
+                                    printRow(out, cells);
                 }
-                printRow(out, cells);
             }
         out.println("</table>");
         out.println("</p>");

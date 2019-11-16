@@ -9,6 +9,7 @@ import noob.plantsystem.common.ArduinoProxy;
 
 import java.util.TreeMap;
 import java.io.IOException;
+import java.sql.Time;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
@@ -128,7 +129,12 @@ public class SystemsViewTag extends SimpleTagSupport {
                 printRow(out, cells);
                 // Lights-on time
                 cells[0].setContents("Lights-On time");
-                cells[1].setContents(Long.toString(sys.getLightsOnTime()));
+                if (sys.getLightsOnTime() > 0) {
+                cells[1].setContents(new Time(sys.getLightsOnTime()).toString());
+                }
+                else {
+                    cells[1].setContents("OFF");
+                }
                 cellStr = "Hours: ";
                 textBox.setWidth(2);
                 textBox.setLightsOnHour();
@@ -140,7 +146,12 @@ public class SystemsViewTag extends SimpleTagSupport {
                 printRow(out, cells);
                 // Lights-off time
                 cells[0].setContents("Lights-Off time");
-                cells[1].setContents(Long.toString(sys.getLightsOffTime()));
+                if (sys.getLightsOffTime() > 0) {
+                cells[1].setContents(new Time(sys.getLightsOffTime()).toString());
+                }
+                else {
+                    cells[1].setContents("OFF");
+                }
                 textBox.setLightsOffHour();
                 cellStr = "Hours: ";
                 cellStr += textBox.toString();

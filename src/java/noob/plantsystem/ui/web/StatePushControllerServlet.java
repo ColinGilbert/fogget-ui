@@ -29,6 +29,20 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
  */
 public class StatePushControllerServlet extends HttpServlet {
 
+    boolean validateTimeOfDay(int hours, int minutes) {
+        if (hours < 0 || minutes < 0) {
+            return false;
+        }
+        if (hours > 23) {
+            return false;
+        }
+        if (minutes > 59) {
+            return false;
+        }
+
+        return true;
+    }
+
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
@@ -55,10 +69,15 @@ public class StatePushControllerServlet extends HttpServlet {
                     Matcher match = pattern.matcher(splitParamName[1]);
                     if (match.find()) { // If the latter half of our parameter name is only numeric
                         System.out.println("Got proper params for machine " + splitParamName[1]);
-                        long timeOffAccumulator = 0;
-                        long timeOnAccumulator = 0;
-                        boolean changingOffTime = false;
-                        boolean changingOnTime = false;
+                        boolean changingOffTimeHours = false;
+                        boolean changingOffTimeMinutes = false;
+                        boolean changingOnTimeHours = false;
+                        boolean changingOnTimeMinutes = false;
+                        int hourOn = 0;
+                        int hourOff = 0;
+                        int minuteOn = 0;
+                        int minuteOff = 0;
+
                         long uid;
                         String[] paramValues = request.getParameterValues(fullParamName);
                         ArduinoConfigChangeRepresentation configChange = new ArduinoConfigChangeRepresentation();
@@ -114,8 +133,8 @@ public class StatePushControllerServlet extends HttpServlet {
                                         try {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
-                                            timeOffAccumulator += 3600000 * Long.parseLong(paramValue);
-                                            changingOffTime = true;
+                                            hourOff = Integer.parseInt(paramValue);
+                                            changingOffTimeHours = true;
                                         } catch (NumberFormatException ex) {
                                         }
                                         break;
@@ -124,8 +143,8 @@ public class StatePushControllerServlet extends HttpServlet {
                                         try {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
-                                            timeOffAccumulator += 60000 * Long.parseLong(paramValue);
-                                            changingOffTime = true;
+                                            minuteOff = Integer.parseInt(paramValue);
+                                            changingOffTimeMinutes = true;
                                         } catch (NumberFormatException ex) {
                                         }
                                         break;
@@ -133,8 +152,9 @@ public class StatePushControllerServlet extends HttpServlet {
                                     case (ParameterNames.updateLightsOnHour): {
                                         try {
 
-                                            timeOnAccumulator += 3600000 * Long.parseLong(paramValue);
-                                            changingOnTime = true;
+                                            // timeOnAccumulator += 3600000 * Long.parseLong(paramValue);
+                                            hourOn = Integer.parseInt(paramValue);
+                                            changingOnTimeHours = true;
                                         } catch (NumberFormatException ex) {
                                         }
                                         break;
@@ -143,8 +163,9 @@ public class StatePushControllerServlet extends HttpServlet {
                                         try {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
-                                            timeOnAccumulator += 60000 * Long.parseLong(paramValue);
-                                            changingOnTime = true;
+                                            // timeOnAccumulator += 60000 * Long.parseLong(paramValue);
+                                            minuteOff = Integer.parseInt(paramValue);
+                                            changingOnTimeMinutes = true;
                                         } catch (NumberFormatException ex) {
                                         }
                                         break;
@@ -195,15 +216,36 @@ public class StatePushControllerServlet extends HttpServlet {
                                         System.out.println("Invalid parameter name: " + firstPart);
                                     }
                                 }
-                                if (changingOffTime) {
-                                    configChange.setLightsOffTime(Long.parseLong(paramValue));
-                                    configChange.setChangingLightsOffTime(true);
+                                if (changingOnTimeHours || changingOnTimeMinutes) {
+                                    changingOnTimeHours = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
+                                    changingOnTimeMinutes = changingOnTimeMinutes && validateTimeOfDay(hourOn, hourOn);
                                 }
-                                if (changingOnTime) {
-                                    configChange.setLightsOnTime(Long.parseLong(paramValue));
+                                if (changingOffTimeHours || changingOffTimeMinutes) {
+                                    changingOffTimeHours = changingOffTimeHours && validateTimeOfDay(hourOff, minuteOff);
+                                    changingOffTimeMinutes = changingOffTimeMinutes && validateTimeOfDay(hourOff, hourOff);
+                                }
+                                long timeOnAccumulator = 0;
+                                if (changingOnTimeHours) {
+                                    timeOnAccumulator += 3600000 * hourOn;
+                                }
+                                if (changingOnTimeMinutes) {
+                                    timeOnAccumulator += 60000 * minuteOn;
+                                }
+                                long timeOffAccumulator = 0;
+                                if (changingOffTimeHours) {
+                                    timeOffAccumulator += 3600000 * hourOff;
+                                }
+                                if (changingOffTimeMinutes) {
+                                    timeOffAccumulator = 60000 * minuteOff;
+                                }
+                                if (changingOnTimeHours || changingOnTimeMinutes) {
+                                    configChange.setLightsOnTime(timeOnAccumulator);
                                     configChange.setChangingLightsOnTime(true);
                                 }
-
+                                if (changingOffTimeHours || changingOffTimeMinutes) {
+                                    configChange.setLightsOffTime(timeOffAccumulator);
+                                    configChange.setChangingLightsOffTime(true);
+                                }
                                 // TODO: Check if some params have more than one value
                             }
                         }
