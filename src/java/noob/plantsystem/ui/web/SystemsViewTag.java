@@ -10,6 +10,7 @@ import noob.plantsystem.common.ArduinoProxy;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.sql.Time;
+import java.time.LocalTime;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
@@ -128,16 +129,12 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setNutrientSolutionRatio();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
-                
                 // Lights-on time
+                final int lightsOnHour = Math.abs(sys.getPersistentState().getLightsOnHour());
+                final int lightsOnMinute = Math.abs(sys.getPersistentState().getLightsOnMinute());
                 cells[0].setContents("Lights-On time");
                 textBox.setWidth(2);
-                if (sys.getPersistentState().getLightsOnTime() > 0) {
-                cells[1].setContents(new Time(sys.getPersistentState().getLightsOnTime()).toString());
-                }
-                else {
-                    cells[1].setContents("OFF");
-                }
+                cells[1].setContents(LocalTime.of(lightsOnHour, lightsOnMinute).toString());   
                 cellStr = "Hours: ";
                 textBox.setLightsOnHour();
                 cellStr += textBox.toString();
@@ -145,16 +142,12 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setLightsOnMinute();
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
-                printRow(out, cells);
-                
+                printRow(out, cells);               
                 // Lights-off time
+                final int lightsOffHour = Math.abs(sys.getPersistentState().getLightsOffHour());
+                final int lightsOffMinute = Math.abs(sys.getPersistentState().getLightsOffMinute());
                 cells[0].setContents("Lights-Off time");
-                if (sys.getPersistentState().getLightsOffTime() > 0) {
-                cells[1].setContents(new Time(sys.getPersistentState().getLightsOffTime()).toString());
-                }
-                else {
-                    cells[1].setContents("OFF");
-                }
+                cells[1].setContents(LocalTime.of(lightsOffHour, lightsOffMinute).toString());
                 cellStr = "Hours: ";
                 textBox.setLightsOffHour();
                 cellStr += textBox.toString();

@@ -40,6 +40,23 @@ public class TextInput {
         uid = uidArg;
     }
 
+    protected void reset() {
+        mistingInterval = false;
+        mistingDuration = false;
+        statusPushInterval = false;
+        nutrientSolutionRatio = false;
+        lightsOffHour = false;
+        lightsOffMinute = false;
+        lightsOnHour = false;
+        lightsOnMinute = false;
+        targetUpperChamberTemperature = false;
+        targetUpperChamberHumidity = false;
+        targetLowerChamberTemperature = false;
+        targetCO2PPM = false;
+        description = false;
+        set = false;     
+    }
+    
     @Override
     public String toString() {
         boolean isArea = false;
@@ -231,22 +248,5 @@ public class TextInput {
        // }
         description = true;
         set = true;
-    }
-
-    protected void reset() {
-        mistingInterval = false;
-        mistingDuration = false;
-        statusPushInterval = false;
-        nutrientSolutionRatio = false;
-        lightsOffHour = false;
-        lightsOffMinute = false;
-        lightsOnHour = false;
-        lightsOnMinute = false;
-        targetUpperChamberTemperature = false;
-        targetUpperChamberHumidity = false;
-        targetLowerChamberTemperature = false;
-        targetCO2PPM = false;
-        description = false;
-        set = false;     
     }
 }

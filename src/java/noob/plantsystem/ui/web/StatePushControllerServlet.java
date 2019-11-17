@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import noob.plantsystem.common.ArduinoConfigChangeRepresentation;
+import noob.plantsystem.common.ArduinoProxy;
+import noob.plantsystem.common.TimeOfDayValidator;
 import noob.plantsystem.common.TopicStrings;
 import org.eclipse.paho.client.mqttv3.MqttClient;
 
@@ -28,20 +30,6 @@ import org.eclipse.paho.client.mqttv3.MqttClient;
  * @author noob
  */
 public class StatePushControllerServlet extends HttpServlet {
-
-    boolean validateTimeOfDay(int hours, int minutes) {
-        if (hours < 0 || minutes < 0) {
-            return false;
-        }
-        if (hours > 23) {
-            return false;
-        }
-        if (minutes > 59) {
-            return false;
-        }
-
-        return true;
-    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -120,30 +108,22 @@ public class StatePushControllerServlet extends HttpServlet {
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOffHour): {
-                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
-                                            // configChange.setChangingLightsOffTime(true);
-                                            hourOff = Integer.parseInt(paramValue);
+                                               hourOff = Integer.parseInt(paramValue);
                                             changingOffTimeHours = true;
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOffMinute): {
-                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
-                                            // configChange.setChangingLightsOffTime(true);
-                                            minuteOff = Integer.parseInt(paramValue);
+                                               minuteOff = Integer.parseInt(paramValue);
                                             changingOffTimeMinutes = true;
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOnHour): {
-                                            // timeOnAccumulator += 3600000 * Long.parseLong(paramValue);
-                                            hourOn = Integer.parseInt(paramValue);
+                                                                     hourOn = Integer.parseInt(paramValue);
                                             changingOnTimeHours = true;
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOnMinute): {
-                                            // configChange.setLightsOffTime(Long.parseLong(paramValue));
-                                            // configChange.setChangingLightsOffTime(true);
-                                            // timeOnAccumulator += 60000 * Long.parseLong(paramValue);
-                                            minuteOn = Integer.parseInt(paramValue);
+                                              minuteOn = Integer.parseInt(paramValue);
                                             changingOnTimeMinutes = true;
                                             break;
                                         }
@@ -180,41 +160,19 @@ public class StatePushControllerServlet extends HttpServlet {
                                     Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
-                            if (changingOnTimeHours || changingOnTimeMinutes) {
-                                boolean valid = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
-                                changingOnTimeHours = changingOnTimeHours && valid;
-                                changingOnTimeMinutes = changingOnTimeMinutes && valid;
-                            }
-                            if (changingOffTimeHours || changingOffTimeMinutes) {
-                                boolean valid = validateTimeOfDay(hourOff, minuteOff);
-                                changingOffTimeHours = changingOffTimeHours && valid;
-                                changingOffTimeMinutes = changingOffTimeMinutes && valid;
-                            }
-                            long timeOnAccumulator = 0;
-                            if (changingOnTimeHours) {
-                                timeOnAccumulator = 3600000 * hourOn;
-                            }
-                            if (changingOnTimeMinutes) {
-                                timeOnAccumulator += 60000 * minuteOn;
-                            }
-                            long timeOffAccumulator = 0;
-                            if (changingOffTimeHours) {
-                                timeOffAccumulator = 3600000 * hourOff;
-                            }
-                            if (changingOffTimeMinutes) {
-                                timeOffAccumulator += 60000 * minuteOff;
-                            }
-                            if (changingOnTimeHours || changingOnTimeMinutes) {
-                                configChange.getPersistentState().setLightsOnTime(timeOnAccumulator);
-                                configChange.setChangingLightsOnTime(true);
-                            }
-                            if (changingOffTimeHours || changingOffTimeMinutes) {
-                                configChange.getPersistentState().setLightsOffTime(timeOffAccumulator);
-                                configChange.setChangingLightsOffTime(true);
-                            }
-                            // TODO: Check if some params have more than one value
-                        }
+                            if (changingOnTimeHours && changingOnTimeMinutes) {
+                                if (TimeOfDayValidator.validate(hourOn, minuteOn)) {
+                                      configChange.getPersistentState().setLightsOnHour(Integer.parseInt(paramValue));
+                                            configChange.setChangingLightsOnHour(true);
 
+                                }
+                            }
+                            if (changingOffTimeHours && changingOffTimeMinutes) {
+                                if (TimeOfDayValidator.validate(hourOff, minuteOff)) {
+                                    
+                                }
+                            }                           
+                        }
                         if (configChange.hasChanges()) {
                             sentToBackend.put(uid, configChange);
                         } else {
