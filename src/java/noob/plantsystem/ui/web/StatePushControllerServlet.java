@@ -59,7 +59,7 @@ public class StatePushControllerServlet extends HttpServlet {
         if (connected) {
             Pattern pattern = Pattern.compile("^[0-9]+$"); // Only numerics
             Enumeration<String> parameterNames = request.getParameterNames();
-            ArrayList<ArduinoConfigChangeRepresentation> sentToBackend = new ArrayList<>();
+            TreeMap<Long, ArduinoConfigChangeRepresentation> sentToBackend = new TreeMap<>();
             boolean changingDescriptions = false;
             TreeMap<Long, String> descriptionsToChange = new TreeMap<>();
             while (parameterNames.hasMoreElements()) {
@@ -78,10 +78,20 @@ public class StatePushControllerServlet extends HttpServlet {
                         int minuteOn = 0;
                         int minuteOff = 0;
 
-                        long uid;
+                        long uid = Long.parseLong(splitParamName[1]);
+                        
                         String[] paramValues = request.getParameterValues(fullParamName);
-                        ArduinoConfigChangeRepresentation configChange = new ArduinoConfigChangeRepresentation();
+
+ 
+                        ArduinoConfigChangeRepresentation configChange;// = new ArduinoConfigChangeRepresentation();
+                        if (sentToBackend.containsKey(uid)) {
+                            configChange = sentToBackend.get(uid);
+                        }
+                        else {
+                            configChange = new ArduinoConfigChangeRepresentation();
+                        }
                         for (String paramValue : paramValues) {
+                            
                             if (!"".equals(paramValue)) { // If we actually have a parameter to send to our backend
                                 final String firstPart = splitParamName[0];
                                 try {
@@ -164,7 +174,7 @@ public class StatePushControllerServlet extends HttpServlet {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
                                             // timeOnAccumulator += 60000 * Long.parseLong(paramValue);
-                                            minuteOff = Integer.parseInt(paramValue);
+                                            minuteOn = Integer.parseInt(paramValue);
                                             changingOnTimeMinutes = true;
                                         } catch (NumberFormatException ex) {
                                         }
@@ -211,32 +221,33 @@ public class StatePushControllerServlet extends HttpServlet {
                                         }
                                         break;
                                     }
-
                                     default: {
                                         System.out.println("Invalid parameter name: " + firstPart);
                                     }
                                 }
                                 if (changingOnTimeHours || changingOnTimeMinutes) {
-                                    changingOnTimeHours = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
-                                    changingOnTimeMinutes = changingOnTimeMinutes && validateTimeOfDay(hourOn, hourOn);
+                                    boolean valid = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
+                                    changingOnTimeHours = changingOnTimeHours && valid;
+                                    changingOnTimeMinutes = changingOnTimeMinutes && valid;
                                 }
                                 if (changingOffTimeHours || changingOffTimeMinutes) {
-                                    changingOffTimeHours = changingOffTimeHours && validateTimeOfDay(hourOff, minuteOff);
-                                    changingOffTimeMinutes = changingOffTimeMinutes && validateTimeOfDay(hourOff, hourOff);
+                                boolean valid = validateTimeOfDay(hourOff, minuteOff);
+                                    changingOffTimeHours = changingOffTimeHours && valid;
+                                    changingOffTimeMinutes = changingOffTimeMinutes && valid;
                                 }
                                 long timeOnAccumulator = 0;
                                 if (changingOnTimeHours) {
-                                    timeOnAccumulator += 3600000 * hourOn;
+                                    timeOnAccumulator = 3600000 * hourOn;
                                 }
                                 if (changingOnTimeMinutes) {
                                     timeOnAccumulator += 60000 * minuteOn;
                                 }
                                 long timeOffAccumulator = 0;
                                 if (changingOffTimeHours) {
-                                    timeOffAccumulator += 3600000 * hourOff;
+                                    timeOffAccumulator = 3600000 * hourOff;
                                 }
                                 if (changingOffTimeMinutes) {
-                                    timeOffAccumulator = 60000 * minuteOff;
+                                    timeOffAccumulator += 60000 * minuteOff;
                                 }
                                 if (changingOnTimeHours || changingOnTimeMinutes) {
                                     configChange.setLightsOnTime(timeOnAccumulator);
@@ -250,7 +261,7 @@ public class StatePushControllerServlet extends HttpServlet {
                             }
                         }
                         if (configChange.hasChanges()) {
-                            sentToBackend.add(configChange);
+                            sentToBackend.put(uid, configChange);
                         } else {
                             System.out.println("Trying to add invalid state changer");
                         }
@@ -261,7 +272,11 @@ public class StatePushControllerServlet extends HttpServlet {
             // out.close();
             // setConfigValues
             if (sentToBackend.size() > 0) {
-                backend.sendControlInformation(sentToBackend);
+                ArrayList<ArduinoConfigChangeRepresentation> results = new ArrayList<>();
+                for (ArduinoConfigChangeRepresentation r : sentToBackend.values()) {
+                    results.add(r);
+            }
+                backend.sendControlInformation(results);
                 System.out.println("Sent message to backend.");
             }
             if (changingDescriptions) {

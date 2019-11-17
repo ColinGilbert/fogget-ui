@@ -130,105 +130,105 @@ public class TextInput {
     }
 
     public void setMistingInterval() {
-        if (!set) {
+      //  if (!set) {
             reset();
-        }
+       // }
         mistingInterval = true;
         set = true;
     }
 
     public void setMistingDuration() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
+       // }
         mistingDuration = true;
         set = true;
     }
 
     public void setStatusPushInterval() {
-        if (!set) {
+      //  if (!set) {
             reset();
-        }
+       // }
         statusPushInterval = true;
         set = true;
     }
 
     public void setNutrientSolutionRatio() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
+       // }
         nutrientSolutionRatio = true;
         set = true;
     }
 
     public void setLightsOnHour() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
+      //  }
         lightsOnHour = true;
         set = true;
     }
 
     public void setLightsOnMinute() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
-        lightsOnHour = true;
+        //}
+        lightsOnMinute = true;
         set = true;
     }
 
     public void setLightsOffHour() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
-        lightsOffMinute = true;
+       // }
+        lightsOffHour = true;
         set = true;
     }
 
     public void setLightsOffMinute() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
+       // }
         lightsOffMinute = true;
         set = true;
     }
 
     public void setTargetUpperChamberHumidity() {
-        if (!set) {
+      //  if (!set) {
             reset();
-        }
+      //  }
         targetUpperChamberHumidity = true;
         set = true;
     }
 
     public void setTargetUpperChamberTemperature() {
-        if (!set) {
+      //  if (!set) {
             reset();
-        }
+      //  }
         targetUpperChamberTemperature = true;
         set = true;
     }
 
     public void setTargetLowerChamberTemperature() {
-        if (!set) {
+       // if (!set) {
             reset();
-        }
+       // }
         targetLowerChamberTemperature = true;
         set = true;
     }
 
     public void setTargetCO2PPM() {
-        if (!set) {
+        //if (!set) {
             reset();
-        }
+        //}
         targetCO2PPM = true;
         set = true;
     }
 
     public void setDescription() {
-        if (!set) {
+        //if (!set) {
             reset();
-        }
+       // }
         description = true;
         set = true;
     }
@@ -241,12 +241,12 @@ public class TextInput {
         lightsOffHour = false;
         lightsOffMinute = false;
         lightsOnHour = false;
-        lightsOffMinute = false;
+        lightsOnMinute = false;
         targetUpperChamberTemperature = false;
         targetUpperChamberHumidity = false;
         targetLowerChamberTemperature = false;
         targetCO2PPM = false;
         description = false;
-        set = false;
+        set = false;     
     }
 }

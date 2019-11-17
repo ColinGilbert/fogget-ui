@@ -127,8 +127,10 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setNutrientSolutionRatio();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
+                
                 // Lights-on time
                 cells[0].setContents("Lights-On time");
+                textBox.setWidth(2);
                 if (sys.getLightsOnTime() > 0) {
                 cells[1].setContents(new Time(sys.getLightsOnTime()).toString());
                 }
@@ -136,7 +138,6 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[1].setContents("OFF");
                 }
                 cellStr = "Hours: ";
-                textBox.setWidth(2);
                 textBox.setLightsOnHour();
                 cellStr += textBox.toString();
                 cellStr += " Minutes: ";
@@ -144,6 +145,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
                 printRow(out, cells);
+                
                 // Lights-off time
                 cells[0].setContents("Lights-Off time");
                 if (sys.getLightsOffTime() > 0) {
@@ -152,15 +154,16 @@ public class SystemsViewTag extends SimpleTagSupport {
                 else {
                     cells[1].setContents("OFF");
                 }
-                textBox.setLightsOffHour();
                 cellStr = "Hours: ";
+                textBox.setLightsOffHour();
                 cellStr += textBox.toString();
-                textBox.setLightsOffMinute();
                 cellStr += " Minutes: ";
+                textBox.setLightsOffMinute();
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
                 printRow(out, cells);
-                textBox.setWidth(0); // Default values\
+                
+                textBox.setWidth(0);
                 textBox.setWidth(8);
                 // Current upper chamber humidity
                 cells[0].setContents("Current upper chamber humidity");

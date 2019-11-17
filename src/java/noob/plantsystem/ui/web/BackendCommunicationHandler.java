@@ -90,6 +90,8 @@ public class BackendCommunicationHandler {
             System.out.println("Descriptions view response : " + response);
             TreeMap<Long, String> results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
             });
+            tcpIn.close();
+            tcpOut.close();
             return results;
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
@@ -106,8 +108,13 @@ public class BackendCommunicationHandler {
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("Systems view response : " + response);
-            return mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
+            TreeMap<Long, ArduinoProxy> results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
             });
+            tcpIn.close();
+            tcpOut.close();
+            
+            return results;
+
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -123,9 +130,11 @@ public class BackendCommunicationHandler {
             String response = tcpIn.nextLine();
             ObjectMapper mapper = new ObjectMapper();
             System.out.println("Events view response: " + response);
-            return mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
+            TreeMap<Long, ArrayDeque<EventRecord>> results =  mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
             });
-
+            tcpIn.close();
+            tcpOut.close();
+            return results;
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -134,6 +143,7 @@ public class BackendCommunicationHandler {
 
     public void sendControlInformation(ArrayList<ArduinoConfigChangeRepresentation> arg) {
         MqttMessage message = new MqttMessage();
+        message.setQos(1);
         ObjectMapper mapper = new ObjectMapper();
         try {
             message.setPayload(mapper.writeValueAsString(arg).getBytes());
