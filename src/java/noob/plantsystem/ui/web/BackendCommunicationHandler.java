@@ -82,15 +82,17 @@ public class BackendCommunicationHandler {
     public TreeMap<Long, String> getSystemDescriptionsView() {
         try {
             Socket socket = new Socket("127.0.0.1", port);
-            Scanner tcpIn = new Scanner(socket.getInputStream());
-            PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GETDESCRIPTIONS");
-            String response = tcpIn.nextLine();
-            ObjectMapper mapper = new ObjectMapper();
-            System.out.println("Descriptions view response : " + response);
-            TreeMap<Long, String> results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
-            });
-            tcpIn.close();
+            PrintWriter tcpOut;
+            TreeMap<Long, String> results;
+            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
+                tcpOut = new PrintWriter(socket.getOutputStream(), true);
+                tcpOut.println("GETDESCRIPTIONS");
+                String response = tcpIn.nextLine();
+                ObjectMapper mapper = new ObjectMapper();
+                System.out.println("Descriptions view response : " + response);
+                results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
+                });
+            }
             tcpOut.close();
             return results;
         } catch (IOException ex) {
@@ -102,15 +104,17 @@ public class BackendCommunicationHandler {
     public TreeMap<Long, ArduinoProxy> getSystemsView() {
         try {
             Socket socket = new Socket("127.0.0.1", port);
-            Scanner tcpIn = new Scanner(socket.getInputStream());
-            PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GETPROXIES");
-            String response = tcpIn.nextLine();
-            ObjectMapper mapper = new ObjectMapper();
-            System.out.println("Systems view response : " + response);
-            TreeMap<Long, ArduinoProxy> results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
-            });
-            tcpIn.close();
+            PrintWriter tcpOut;
+            TreeMap<Long, ArduinoProxy> results;
+            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
+                tcpOut = new PrintWriter(socket.getOutputStream(), true);
+                tcpOut.println("GETPROXIES");
+                String response = tcpIn.nextLine();
+                ObjectMapper mapper = new ObjectMapper();
+                System.out.println("Systems view response : " + response);
+                results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
+                });
+            }
             tcpOut.close();
             
             return results;
@@ -124,15 +128,17 @@ public class BackendCommunicationHandler {
     public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView() {
         try {
             Socket socket = new Socket("127.0.0.1", port);
-            Scanner tcpIn = new Scanner(socket.getInputStream());
-            PrintWriter tcpOut = new PrintWriter(socket.getOutputStream(), true);
-            tcpOut.println("GETEVENTS");
-            String response = tcpIn.nextLine();
-            ObjectMapper mapper = new ObjectMapper();
-            System.out.println("Events view response: " + response);
-            TreeMap<Long, ArrayDeque<EventRecord>> results =  mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
-            });
-            tcpIn.close();
+            PrintWriter tcpOut;
+            TreeMap<Long, ArrayDeque<EventRecord>> results;
+            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
+                tcpOut = new PrintWriter(socket.getOutputStream(), true);
+                tcpOut.println("GETEVENTS");
+                String response = tcpIn.nextLine();
+                ObjectMapper mapper = new ObjectMapper();
+                System.out.println("Events view response: " + response);
+                results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
+                });
+            } 
             tcpOut.close();
             return results;
         } catch (IOException ex) {
