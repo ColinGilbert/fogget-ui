@@ -14,6 +14,7 @@ import java.time.LocalTime;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
+import noob.plantsystem.common.TimeOfDayValidator;
 
 /**
  *
@@ -134,7 +135,15 @@ public class SystemsViewTag extends SimpleTagSupport {
                 final int lightsOnMinute = Math.abs(sys.getPersistentState().getLightsOnMinute());
                 cells[0].setContents("Lights-On time");
                 textBox.setWidth(2);
-                cells[1].setContents(LocalTime.of(lightsOnHour, lightsOnMinute).toString());   
+                boolean validTime = TimeOfDayValidator.validate(lightsOnHour, lightsOnMinute);
+                if (validTime) {
+                    cells[1].setContents(LocalTime.of(lightsOnHour, lightsOnMinute).toString());
+
+                } else {
+                    cells[1].setContents("Invalid");
+
+                }
+                cells[2].setContents("Invalid");
                 cellStr = "Hours: ";
                 textBox.setLightsOnHour();
                 cellStr += textBox.toString();
@@ -142,12 +151,17 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setLightsOnMinute();
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
-                printRow(out, cells);               
+                printRow(out, cells);
                 // Lights-off time
                 final int lightsOffHour = Math.abs(sys.getPersistentState().getLightsOffHour());
                 final int lightsOffMinute = Math.abs(sys.getPersistentState().getLightsOffMinute());
                 cells[0].setContents("Lights-Off time");
-                cells[1].setContents(LocalTime.of(lightsOffHour, lightsOffMinute).toString());
+                validTime = TimeOfDayValidator.validate(lightsOffHour, lightsOffMinute);
+                if (validTime) {
+                    cells[1].setContents(LocalTime.of(lightsOffHour, lightsOffMinute).toString());
+                } else {
+                    cells[1].setContents("Invalid");
+                }
                 cellStr = "Hours: ";
                 textBox.setLightsOffHour();
                 cellStr += textBox.toString();
@@ -156,7 +170,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
                 printRow(out, cells);
-                
+
                 textBox.setWidth(0);
                 textBox.setWidth(8);
                 // Current upper chamber humidity
@@ -237,7 +251,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                 out.println("</table>");
                 out.println("<br />");
                 out.println("<input type=\"submit\">");
-                                     }
+            }
         } else { // Print error message for user.
             out.println("Could not connect to backend. :(");
         }

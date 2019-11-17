@@ -57,15 +57,6 @@ public class StatePushControllerServlet extends HttpServlet {
                     Matcher match = pattern.matcher(splitParamName[1]);
                     if (match.find()) { // If the latter half of our parameter name is only numeric
                         System.out.println("Got proper params for machine " + splitParamName[1]);
-                        boolean changingOffTimeHours = false;
-                        boolean changingOffTimeMinutes = false;
-                        boolean changingOnTimeHours = false;
-                        boolean changingOnTimeMinutes = false;
-                        int hourOn = 0;
-                        int hourOff = 0;
-                        int minuteOn = 0;
-                        int minuteOff = 0;
-
                         long uid = Long.parseLong(splitParamName[1]);
                         String[] paramValues = request.getParameterValues(fullParamName);
                         ArduinoConfigChangeRepresentation configChange;// = new ArduinoConfigChangeRepresentation();
@@ -84,7 +75,7 @@ public class StatePushControllerServlet extends HttpServlet {
                                     Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                     continue;
                                 }
-                                   configChange.getPersistentState().setUid(uid);
+                                configChange.getPersistentState().setUid(uid);
                                 try {
                                     switch (firstPart) {
                                         case (ParameterNames.updateMistingInterval): {
@@ -108,23 +99,23 @@ public class StatePushControllerServlet extends HttpServlet {
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOffHour): {
-                                               hourOff = Integer.parseInt(paramValue);
-                                            changingOffTimeHours = true;
+                                            configChange.getPersistentState().setLightsOffHour(Integer.parseInt(paramValue));
+                                            configChange.setChangingLightsOffHour(true);
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOffMinute): {
-                                               minuteOff = Integer.parseInt(paramValue);
-                                            changingOffTimeMinutes = true;
+                                            configChange.getPersistentState().setLightsOffMinute(Integer.parseInt(paramValue));
+                                            configChange.setChangingLightsOffMinute(true);
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOnHour): {
-                                                                     hourOn = Integer.parseInt(paramValue);
-                                            changingOnTimeHours = true;
+                                            configChange.getPersistentState().setLightsOnHour(Integer.parseInt(paramValue));
+                                            configChange.setChangingLightsOnHour(true);
                                             break;
                                         }
                                         case (ParameterNames.updateLightsOnMinute): {
-                                              minuteOn = Integer.parseInt(paramValue);
-                                            changingOnTimeMinutes = true;
+                                            configChange.getPersistentState().setLightsOnMinute(Integer.parseInt(paramValue));
+                                            configChange.setChangingLightsOnMinute(true);
                                             break;
                                         }
                                         case (ParameterNames.updateTargetUpperChamberHumidity): {
@@ -160,30 +151,15 @@ public class StatePushControllerServlet extends HttpServlet {
                                     Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                 }
                             }
-                            if (changingOnTimeHours && changingOnTimeMinutes) {
-                                if (TimeOfDayValidator.validate(hourOn, minuteOn)) {
-                                      configChange.getPersistentState().setLightsOnHour(Integer.parseInt(paramValue));
-                                            configChange.setChangingLightsOnHour(true);
-
-                                }
+                            if (configChange.hasChanges()) {
+                                sentToBackend.put(uid, configChange);
+                            } else {
+                                System.out.println("Trying to add invalid state changer");
                             }
-                            if (changingOffTimeHours && changingOffTimeMinutes) {
-                                if (TimeOfDayValidator.validate(hourOff, minuteOff)) {
-                                    
-                                }
-                            }                           
                         }
-                        if (configChange.hasChanges()) {
-                            sentToBackend.put(uid, configChange);
-                        } else {
-                            System.out.println("Trying to add invalid state changer");
-                        }
-
                     }
                 }
             }
-            // out.close();
-            // setConfigValues
             if (sentToBackend.size() > 0) {
                 ArrayList<ArduinoConfigChangeRepresentation> results = new ArrayList<>();
                 for (ArduinoConfigChangeRepresentation r : sentToBackend.values()) {
