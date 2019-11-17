@@ -52,9 +52,10 @@ public class SystemsViewTag extends SimpleTagSupport {
                 out.println("<br />");
                 out.println("<table>");
                 int firstColSpan = 2;
+                final long uid = sys.getPersistentState().getUid();
                 // Print the description and uid.
                 TableCell cells[] = new TableCell[2];
-                TextInput textBox = new TextInput(out, sys.getUid());
+                TextInput textBox = new TextInput(out, sys.getPersistentState().getUid());
                 for (int i = 0; i < cells.length; i++) {
                     TableCell c = new TableCell();
                     cells[i] = c;
@@ -62,17 +63,17 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cells[0].setColSpan(firstColSpan);
                 cells[0].setHeader(true);
                 cells[1].setColSpan(horizSpan - firstColSpan);
-                cells[0].setContents("UID: " + Long.toString(sys.getUid()));
+                cells[0].setContents("UID: " + Long.toString(sys.getPersistentState().getUid()));
                 String cellStr;
-                if (descriptions.containsKey(sys.getUid())) {
-                    cellStr = descriptions.get(sys.getUid());
+                if (descriptions.containsKey(sys.getPersistentState().getUid())) {
+                    cellStr = descriptions.get(sys.getPersistentState().getUid());
                 } else {
                     cellStr = "This is the default description. Set a new one in the box below!";
                 }
                 cells[1].setContents(cellStr);
                 printRow(out, cells);
                 cellStr = "<a href=\"events.jsp?uid=";
-                cellStr += sys.getUid();
+                cellStr += sys.getPersistentState().getUid();
                 cellStr += "\"> View events for this system</a>";
                 textBox.setDescription();
                 //textBox.setHeight(3);
@@ -105,25 +106,25 @@ public class SystemsViewTag extends SimpleTagSupport {
                 }
                 // Print the misting interval
                 cells[0].setContents("Misting interval");
-                cells[1].setContents(sys.getMistingInterval() + "ms");
+                cells[1].setContents(sys.getPersistentState().getMistingInterval() + "ms");
                 textBox.setMistingInterval();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Print the misting duration
                 cells[0].setContents("Misting duration");
-                cells[1].setContents(sys.getMistingDuration() + "ms");
+                cells[1].setContents(sys.getPersistentState().getMistingDuration() + "ms");
                 textBox.setMistingDuration();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Print the status push interval
                 cells[0].setContents("Status push interval: ");//sys.getStatusPushUpdateInterval())
-                cells[1].setContents(sys.getStatusPushInterval() + "ms");
+                cells[1].setContents(sys.getPersistentState().getStatusPushInterval() + "ms");
                 textBox.setStatusPushInterval();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Nutrients to water feed ratio
                 cells[0].setContents("Nutrient sol'n to water ratio");
-                cells[1].setContents(Double.toString(sys.getNutrientSolutionRatio()));
+                cells[1].setContents(Double.toString(sys.getPersistentState().getNutrientSolutionRatio()));
                 textBox.setNutrientSolutionRatio();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
@@ -131,8 +132,8 @@ public class SystemsViewTag extends SimpleTagSupport {
                 // Lights-on time
                 cells[0].setContents("Lights-On time");
                 textBox.setWidth(2);
-                if (sys.getLightsOnTime() > 0) {
-                cells[1].setContents(new Time(sys.getLightsOnTime()).toString());
+                if (sys.getPersistentState().getLightsOnTime() > 0) {
+                cells[1].setContents(new Time(sys.getPersistentState().getLightsOnTime()).toString());
                 }
                 else {
                     cells[1].setContents("OFF");
@@ -148,8 +149,8 @@ public class SystemsViewTag extends SimpleTagSupport {
                 
                 // Lights-off time
                 cells[0].setContents("Lights-Off time");
-                if (sys.getLightsOffTime() > 0) {
-                cells[1].setContents(new Time(sys.getLightsOffTime()).toString());
+                if (sys.getPersistentState().getLightsOffTime() > 0) {
+                cells[1].setContents(new Time(sys.getPersistentState().getLightsOffTime()).toString());
                 }
                 else {
                     cells[1].setContents("OFF");
@@ -167,37 +168,37 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setWidth(8);
                 // Current upper chamber humidity
                 cells[0].setContents("Current upper chamber humidity");
-                cells[1].setContents(Float.toString(sys.getCurrentUpperChamberHumidity()));
+                cells[1].setContents(Float.toString(sys.getTransientState().getCurrentUpperChamberHumidity()));
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber humidity
                 cells[0].setContents("Target upper chamber humidity");
-                cells[1].setContents(Float.toString(sys.getTargetUpperChamberHumidity()));
+                cells[1].setContents(Float.toString(sys.getPersistentState().getTargetUpperChamberHumidity()));
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Current upper chamber temperature
                 cells[0].setContents("Current upper chamber temperature ");
-                cells[1].setContents(Float.toString(sys.getCurrentUpperChamberTemperature()));
+                cells[1].setContents(Float.toString(sys.getTransientState().getCurrentUpperChamberTemperature()));
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber temperature                
                 cells[0].setContents("Target upper chamber temperature");
-                cells[1].setContents(Float.toString(sys.getTargetUpperChamberTemperature()));
+                cells[1].setContents(Float.toString(sys.getPersistentState().getTargetUpperChamberTemperature()));
                 textBox.setTargetUpperChamberTemperature();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Current CO2 PPM
                 cells[0].setContents("Current CO2 PPM");
-                cells[1].setContents(Long.toString(sys.getCurrentCO2PPM()));
+                cells[1].setContents(Long.toString(sys.getTransientState().getCurrentCO2PPM()));
                 textBox.setTargetCO2PPM();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target CO2 PPM
                 cells[0].setContents("Target CO2 PPM");
-                cells[1].setContents(Long.toString(sys.getTargetCO2PPM()));
+                cells[1].setContents(Long.toString(sys.getPersistentState().getTargetCO2PPM()));
                 textBox.setTargetCO2PPM();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
@@ -225,14 +226,14 @@ public class SystemsViewTag extends SimpleTagSupport {
                 for (TableCell cell : cells) {
                     cell.setHeader(false);
                 }
-                cells[0] = booleanCell(sys.isPowered());
-                cells[1] = booleanCell(sys.isLit());
-                cells[2] = booleanCell(sys.isMisting());
-                cells[3] = booleanCell(sys.isLocked());
-                cells[4] = booleanCell(sys.isOpen());
-                cells[5] = booleanCell(sys.isDehumidifying());
-                cells[6] = booleanCell(sys.isCooling());
-                cells[7] = booleanCell(sys.isInjectingCO2());
+                cells[0] = booleanCell(sys.getTransientState().isPowered());
+                cells[1] = booleanCell(sys.getTransientState().isLit());
+                cells[2] = booleanCell(sys.getTransientState().isMisting());
+                cells[3] = booleanCell(sys.getTransientState().isLocked());
+                cells[4] = booleanCell(sys.getTransientState().isOpen());
+                cells[5] = booleanCell(sys.getTransientState().isDehumidifying());
+                cells[6] = booleanCell(sys.getTransientState().isCooling());
+                cells[7] = booleanCell(sys.getTransientState().isInjectingCO2());
                 printRow(out, cells);
                 cells = new TableCell[1];
                 // Instantiate the objects

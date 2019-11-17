@@ -79,19 +79,15 @@ public class StatePushControllerServlet extends HttpServlet {
                         int minuteOff = 0;
 
                         long uid = Long.parseLong(splitParamName[1]);
-                        
                         String[] paramValues = request.getParameterValues(fullParamName);
-
- 
                         ArduinoConfigChangeRepresentation configChange;// = new ArduinoConfigChangeRepresentation();
                         if (sentToBackend.containsKey(uid)) {
                             configChange = sentToBackend.get(uid);
-                        }
-                        else {
+                        } else {
                             configChange = new ArduinoConfigChangeRepresentation();
+//                            configChange.setPersistentState(new);
                         }
                         for (String paramValue : paramValues) {
-                            
                             if (!"".equals(paramValue)) { // If we actually have a parameter to send to our backend
                                 final String firstPart = splitParamName[0];
                                 try {
@@ -100,166 +96,125 @@ public class StatePushControllerServlet extends HttpServlet {
                                     Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                     continue;
                                 }
+                                   configChange.getPersistentState().setUid(uid);
                                 try {
-                                    configChange.setUid(uid);
-                                } catch (NumberFormatException ex) {
-                                    Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
-                                    break;
-                                }
-                                switch (firstPart) {
-                                    case (ParameterNames.updateMistingInterval): {
-                                        try {
-                                            configChange.setMistingInterval(Integer.parseInt(paramValue));
+                                    switch (firstPart) {
+                                        case (ParameterNames.updateMistingInterval): {
+                                            configChange.getPersistentState().setMistingInterval(Integer.parseInt(paramValue));
                                             configChange.setChangingMistingInterval(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateMistingDuration): {
-                                        try {
-                                            configChange.setMistingDuration(Integer.parseInt(paramValue));
+                                        case (ParameterNames.updateMistingDuration): {
+                                            configChange.getPersistentState().setMistingDuration(Integer.parseInt(paramValue));
                                             configChange.setChangingMistingDuration(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateStatusPushInterval): {
-                                        try {
-                                            configChange.setStatusPushInterval(Integer.parseInt(paramValue));
+                                        case (ParameterNames.updateStatusPushInterval): {
+                                            configChange.getPersistentState().setStatusPushInterval(Integer.parseInt(paramValue));
                                             configChange.setChangingStatusPushInterval(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateNutrientSolutionRatio): {
-                                        try {
-                                            configChange.setNutrientSolutionRatio(Float.parseFloat(paramValue));
+                                        case (ParameterNames.updateNutrientSolutionRatio): {
+                                            configChange.getPersistentState().setNutrientSolutionRatio(Float.parseFloat(paramValue));
                                             configChange.setChangingNutrientSolutionRatio(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateLightsOffHour): {
-                                        try {
+                                        case (ParameterNames.updateLightsOffHour): {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
                                             hourOff = Integer.parseInt(paramValue);
                                             changingOffTimeHours = true;
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateLightsOffMinute): {
-                                        try {
+                                        case (ParameterNames.updateLightsOffMinute): {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
                                             minuteOff = Integer.parseInt(paramValue);
                                             changingOffTimeMinutes = true;
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateLightsOnHour): {
-                                        try {
-
+                                        case (ParameterNames.updateLightsOnHour): {
                                             // timeOnAccumulator += 3600000 * Long.parseLong(paramValue);
                                             hourOn = Integer.parseInt(paramValue);
                                             changingOnTimeHours = true;
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateLightsOnMinute): {
-                                        try {
+                                        case (ParameterNames.updateLightsOnMinute): {
                                             // configChange.setLightsOffTime(Long.parseLong(paramValue));
                                             // configChange.setChangingLightsOffTime(true);
                                             // timeOnAccumulator += 60000 * Long.parseLong(paramValue);
                                             minuteOn = Integer.parseInt(paramValue);
                                             changingOnTimeMinutes = true;
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateTargetUpperChamberHumidity): {
-                                        try {
-                                            configChange.setTargetUpperChamberHumidity(Float.parseFloat(paramValue));
+                                        case (ParameterNames.updateTargetUpperChamberHumidity): {
+                                            configChange.getPersistentState().setTargetUpperChamberHumidity(Float.parseFloat(paramValue));
                                             configChange.setChangingTargetUpperChamberHumidity(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateTargetUpperChamberTemperature): {
-                                        try {
-                                            configChange.setTargetUpperChamberTemperature(Float.parseFloat(paramValue));
+                                        case (ParameterNames.updateTargetUpperChamberTemperature): {
+                                            configChange.getPersistentState().setTargetUpperChamberTemperature(Float.parseFloat(paramValue));
                                             configChange.setChangingTargetUpperChamberTemperature(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateTargetLowerChamberTemperature): {
-                                        try {
-                                            configChange.setTargetLowerChamberTemperature(Float.parseFloat(paramValue));
+                                        case (ParameterNames.updateTargetLowerChamberTemperature): {
+                                            configChange.getPersistentState().setTargetLowerChamberTemperature(Float.parseFloat(paramValue));
                                             configChange.setChangingTargetLowerChamberTemperature(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateTargetCO2PPM): {
-                                        try {
-                                            configChange.setTargetCO2PPM(Integer.parseInt(paramValue));
+                                        case (ParameterNames.updateTargetCO2PPM): {
+                                            configChange.getPersistentState().setTargetCO2PPM(Integer.parseInt(paramValue));
                                             configChange.setChangingTargetCO2PPM(true);
-                                        } catch (NumberFormatException ex) {
+                                            break;
                                         }
-                                        break;
-                                    }
-                                    case (ParameterNames.updateDescription): {
-                                        try {
+                                        case (ParameterNames.updateDescription): {
                                             descriptionsToChange.put(uid, paramValue);
                                             changingDescriptions = true;
-                                        } catch (NumberFormatException ex) {
-                                            changingDescriptions = true;
+                                            break;
                                         }
-                                        break;
+                                        default: {
+                                            System.out.println("Invalid parameter name: " + firstPart);
+                                        }
                                     }
-                                    default: {
-                                        System.out.println("Invalid parameter name: " + firstPart);
-                                    }
+                                } catch (NumberFormatException ex) {
+                                    Logger.getLogger(StatePushControllerServlet.class.getName()).log(Level.SEVERE, null, ex);
                                 }
-                                if (changingOnTimeHours || changingOnTimeMinutes) {
-                                    boolean valid = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
-                                    changingOnTimeHours = changingOnTimeHours && valid;
-                                    changingOnTimeMinutes = changingOnTimeMinutes && valid;
-                                }
-                                if (changingOffTimeHours || changingOffTimeMinutes) {
-                                boolean valid = validateTimeOfDay(hourOff, minuteOff);
-                                    changingOffTimeHours = changingOffTimeHours && valid;
-                                    changingOffTimeMinutes = changingOffTimeMinutes && valid;
-                                }
-                                long timeOnAccumulator = 0;
-                                if (changingOnTimeHours) {
-                                    timeOnAccumulator = 3600000 * hourOn;
-                                }
-                                if (changingOnTimeMinutes) {
-                                    timeOnAccumulator += 60000 * minuteOn;
-                                }
-                                long timeOffAccumulator = 0;
-                                if (changingOffTimeHours) {
-                                    timeOffAccumulator = 3600000 * hourOff;
-                                }
-                                if (changingOffTimeMinutes) {
-                                    timeOffAccumulator += 60000 * minuteOff;
-                                }
-                                if (changingOnTimeHours || changingOnTimeMinutes) {
-                                    configChange.setLightsOnTime(timeOnAccumulator);
-                                    configChange.setChangingLightsOnTime(true);
-                                }
-                                if (changingOffTimeHours || changingOffTimeMinutes) {
-                                    configChange.setLightsOffTime(timeOffAccumulator);
-                                    configChange.setChangingLightsOffTime(true);
-                                }
-                                // TODO: Check if some params have more than one value
                             }
+                            if (changingOnTimeHours || changingOnTimeMinutes) {
+                                boolean valid = changingOnTimeHours && validateTimeOfDay(hourOn, minuteOn);
+                                changingOnTimeHours = changingOnTimeHours && valid;
+                                changingOnTimeMinutes = changingOnTimeMinutes && valid;
+                            }
+                            if (changingOffTimeHours || changingOffTimeMinutes) {
+                                boolean valid = validateTimeOfDay(hourOff, minuteOff);
+                                changingOffTimeHours = changingOffTimeHours && valid;
+                                changingOffTimeMinutes = changingOffTimeMinutes && valid;
+                            }
+                            long timeOnAccumulator = 0;
+                            if (changingOnTimeHours) {
+                                timeOnAccumulator = 3600000 * hourOn;
+                            }
+                            if (changingOnTimeMinutes) {
+                                timeOnAccumulator += 60000 * minuteOn;
+                            }
+                            long timeOffAccumulator = 0;
+                            if (changingOffTimeHours) {
+                                timeOffAccumulator = 3600000 * hourOff;
+                            }
+                            if (changingOffTimeMinutes) {
+                                timeOffAccumulator += 60000 * minuteOff;
+                            }
+                            if (changingOnTimeHours || changingOnTimeMinutes) {
+                                configChange.getPersistentState().setLightsOnTime(timeOnAccumulator);
+                                configChange.setChangingLightsOnTime(true);
+                            }
+                            if (changingOffTimeHours || changingOffTimeMinutes) {
+                                configChange.getPersistentState().setLightsOffTime(timeOffAccumulator);
+                                configChange.setChangingLightsOffTime(true);
+                            }
+                            // TODO: Check if some params have more than one value
                         }
+
                         if (configChange.hasChanges()) {
                             sentToBackend.put(uid, configChange);
                         } else {
@@ -275,7 +230,7 @@ public class StatePushControllerServlet extends HttpServlet {
                 ArrayList<ArduinoConfigChangeRepresentation> results = new ArrayList<>();
                 for (ArduinoConfigChangeRepresentation r : sentToBackend.values()) {
                     results.add(r);
-            }
+                }
                 backend.sendControlInformation(results);
                 System.out.println("Sent message to backend.");
             }

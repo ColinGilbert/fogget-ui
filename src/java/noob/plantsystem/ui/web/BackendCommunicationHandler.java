@@ -26,7 +26,7 @@ import noob.plantsystem.common.TopicStrings;
 import noob.plantsystem.common.PersistentArduinoState;
 import noob.plantsystem.common.EventRecord;
 import noob.plantsystem.common.ArduinoProxy;
-import noob.plantsystem.common.EventsViewRequestRepresentation;
+//import noob.plantsystem.common.EventsViewRequestRepresentation;
 import noob.plantsystem.common.ArduinoConfigChangeRepresentation;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
