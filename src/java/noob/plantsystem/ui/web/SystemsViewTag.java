@@ -9,7 +9,6 @@ import noob.plantsystem.common.ArduinoProxy;
 
 import java.util.TreeMap;
 import java.io.IOException;
-import java.sql.Time;
 import java.text.DecimalFormat;
 import java.time.LocalTime;
 import javax.servlet.jsp.JspException;
@@ -52,7 +51,6 @@ public class SystemsViewTag extends SimpleTagSupport {
         if (connected) {
             TreeMap<Long, ArduinoProxy> systems = backend.getSystemsView();
             TreeMap<Long, String> descriptions = backend.getSystemDescriptionsView();
-
             for (ArduinoProxy sys : systems.values()) {
                 // out.println("<br />");
                 out.println("<table>");
