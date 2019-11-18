@@ -16,15 +16,15 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Fogget-About-It-Grow-System</title>
-    </head>
-    <body>
-        <h3>Plant growth cluster management system web interface.</h3>
-        <p><a href="index.jsp" >Go back</a></p>
-        <noob:EventsView uid="<%= request.getParameter("uid") %>"/>
-        <p><a href="index.jsp" >Go back</a></p>
-
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Fogget-About-It-Grow-System</title>
+<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+<h3>Plant growth cluster management system web interface.</h3>
+<p><a href="index.jsp" >Go back</a></p>
+<noob:EventsView uid="<%= request.getParameter("uid") %>"/>
+<p><a href="index.jsp" >Go back</a></p>
+</body>
 </html>

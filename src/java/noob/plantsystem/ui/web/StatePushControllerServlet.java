@@ -144,7 +144,7 @@ public class StatePushControllerServlet extends HttpServlet {
                                             break;
                                         }
                                         default: {
-                                            System.out.println("Invalid parameter name: " + firstPart);
+                                        //    System.out.println("Invalid parameter name: " + firstPart);
                                         }
                                     }
                                 } catch (NumberFormatException ex) {
@@ -154,7 +154,7 @@ public class StatePushControllerServlet extends HttpServlet {
                             if (configChange.hasChanges()) {
                                 sentToBackend.put(uid, configChange);
                             } else {
-                                System.out.println("Trying to add invalid state changer");
+                             //   System.out.println("Trying to add invalid state changer");
                             }
                         }
                     }

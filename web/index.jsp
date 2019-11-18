@@ -17,15 +17,18 @@
 
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <title>Fogget-About-It-Grow-System</title>
-    </head>
-    <body>
-        <h3>Plant growth cluster management system web interface.</h3>
-        <p>This is where you view the overall state of your machine network and change settings.</p>
-        <form name="config-changer" action="ControllerServlet">
-            <noob:SystemsView/>
-        </form>
-    </body>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Fogget-About-It Grow System</title>
+<link rel="stylesheet" type="text/css" href="default.css" />
+</head>
+<body>
+<h3>Fogget-About-It fogponics farm management system</h3>
+<h4>Version 1.0</h4>
+<p>This is where you view the overall state of your machine network and change settings.</p>
+<p><b>Note:</b> Growboxes that cannot be reached over the network get automatically taken off this list and will be restored upon rediscovery.</p>
+<form name="config-changer" action="ControllerServlet">
+<noob:SystemsView/>
+</form>
+</body>
 </html>

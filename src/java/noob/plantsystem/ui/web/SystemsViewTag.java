@@ -52,8 +52,9 @@ public class SystemsViewTag extends SimpleTagSupport {
         if (connected) {
             TreeMap<Long, ArduinoProxy> systems = backend.getSystemsView();
             TreeMap<Long, String> descriptions = backend.getSystemDescriptionsView();
+
             for (ArduinoProxy sys : systems.values()) {
-                out.println("<br />");
+                // out.println("<br />");
                 out.println("<table>");
                 int firstColSpan = 2;
                 final long uid = sys.getPersistentState().getUid();
@@ -65,9 +66,9 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[i] = c;
                 }
                 cells[0].setColSpan(firstColSpan);
-                cells[0].setHeader(true);
+                //cells[0].setHeader(true);
                 cells[1].setColSpan(horizSpan - firstColSpan);
-                cells[0].setContents("UID: " + Long.toString(sys.getPersistentState().getUid()));
+                cells[0].setContents("<b>UID</b>: " + Long.toString(sys.getPersistentState().getUid()));
                 String cellStr;
                 if (descriptions.containsKey(sys.getPersistentState().getUid())) {
                     cellStr = descriptions.get(sys.getPersistentState().getUid());
@@ -80,7 +81,8 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cellStr += sys.getPersistentState().getUid();
                 cellStr += "\"> View events for this system</a>";
                 textBox.setDescription();
-                textBox.setWidth(70);
+                textBox.setWidth(45);
+                textBox.setHeight(3);
                 cells[0].setContents(cellStr);
                 cells[1].setColSpan(horizSpan - firstColSpan);
                 cells[1].setContents(textBox.toString());
@@ -110,18 +112,18 @@ public class SystemsViewTag extends SimpleTagSupport {
                 final String secondsText = " sec";
                 final String celsiusText = " &#8451;";
                 final String percentText = " %";
-                final String ppmText = " ppM";
+                final String ppmText = " PPM";
                 // Print the misting interval
                 cells[0].setContents("Misting interval");
                 cells[1].setContents(sys.getPersistentState().getMistingInterval() / CommonValues.millisInSec + secondsText);
                 textBox.setMistingInterval();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + secondsText);
                 printRow(out, cells);
                 // Print the misting duration
                 cells[0].setContents("Misting duration");
                 cells[1].setContents(sys.getPersistentState().getMistingDuration() / CommonValues.millisInSec + secondsText);
                 textBox.setMistingDuration();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + secondsText);
                 printRow(out, cells);
                 //
                 // This particular part of the system is going to be left out until a later revision.
@@ -139,7 +141,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cells[0].setContents("Nutrient sol'n to water ratio");
                 cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getNutrientSolutionRatio()));
                 textBox.setNutrientSolutionRatio();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + " :1");
                 printRow(out, cells);
                 // Lights-on time
                 final int lightsOnHour = Math.abs(sys.getPersistentState().getLightsOnHour());
@@ -154,10 +156,8 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[1].setContents("Invalid");
                 }
                 cells[2].setContents("Invalid");
-                cellStr = "Hours: ";
                 textBox.setLightsOnHour();
-                cellStr += textBox.toString();
-                cellStr += " Minutes: ";
+                cellStr = textBox.toString() + " : ";
                 textBox.setLightsOnMinute();
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
@@ -172,10 +172,9 @@ public class SystemsViewTag extends SimpleTagSupport {
                 } else {
                     cells[1].setContents("Invalid");
                 }
-                cellStr = "Hours: ";
                 textBox.setLightsOffHour();
-                cellStr += textBox.toString();
-                cellStr += " Minutes: ";
+                cellStr = textBox.toString();
+                cellStr += " : ";
                 textBox.setLightsOffMinute();
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
@@ -184,25 +183,25 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setWidth(8);
                 // Current upper chamber humidity
                 decimalFormatter = new DecimalFormat("#.###");
-                cells[0].setContents("Current upper chamber humidity");
+                cells[0].setContents("Current chamber humidity");
                 cells[1].setContents(decimalFormatter.format(sys.getTransientState().getCurrentUpperChamberHumidity()) + percentText);
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber humidity
-                cells[0].setContents("Target upper chamber humidity");
+                cells[0].setContents("Target chamber humidity");
                 cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getTargetUpperChamberHumidity()) + percentText);
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents(textBox.toString() + percentText);
                 printRow(out, cells);
                 // Current upper chamber temperature
-                cells[0].setContents("Current upper chamber temperature ");
+                cells[0].setContents("Current chamber temp");
                 cells[1].setContents(decimalFormatter.format(sys.getTransientState().getCurrentUpperChamberTemperature()) + celsiusText);
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber temperature                
-                cells[0].setContents("Target upper chamber temperature");
+                cells[0].setContents("Target chamber temp");
                 cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getTargetUpperChamberTemperature()) + celsiusText);
                 textBox.setTargetUpperChamberTemperature();
                 cells[2].setContents(textBox.toString() + celsiusText);
@@ -259,7 +258,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                     cells[i] = c;//new TableCell();
                 }
                 out.println("</table>");
-                out.println("<br />");
+                //out.println("<br />");
                 out.println("<input type=\"submit\">");
             }
         } else { // Print error message for user.
