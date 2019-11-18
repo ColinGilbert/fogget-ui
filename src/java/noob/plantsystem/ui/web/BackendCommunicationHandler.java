@@ -26,7 +26,6 @@ import noob.plantsystem.common.TopicStrings;
 import noob.plantsystem.common.PersistentArduinoState;
 import noob.plantsystem.common.EventRecord;
 import noob.plantsystem.common.ArduinoProxy;
-//import noob.plantsystem.common.EventsViewRequestRepresentation;
 import noob.plantsystem.common.ArduinoConfigChangeRepresentation;
 
 import org.eclipse.paho.client.mqttv3.MqttClient;
@@ -50,6 +49,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.TreeMap;
+import noob.plantsystem.common.CommonValues;
 
 /**
  *
@@ -57,14 +57,11 @@ import java.util.TreeMap;
  */
 public class BackendCommunicationHandler {
 
-    protected int port = 6777;
-
     public boolean connect() {
         MqttConnectOptions connectionOptions = new MqttConnectOptions();
         connectionOptions.setCleanSession(true); // We want the broker to remember past subscriptions.
-        final String brokerURL = "tcp://127.0.0.1:1883";
         try {
-            client = new MqttClient(brokerURL, MqttClient.generateClientId(), new MemoryPersistence());
+            client = new MqttClient(CommonValues.mqttBrokerURL, MqttClient.generateClientId(), new MemoryPersistence());
         } catch (MqttException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -81,12 +78,12 @@ public class BackendCommunicationHandler {
 
     public TreeMap<Long, String> getSystemDescriptionsView() {
         try {
-            Socket socket = new Socket("127.0.0.1", port);
+            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
             PrintWriter tcpOut;
             TreeMap<Long, String> results;
             try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
                 tcpOut = new PrintWriter(socket.getOutputStream(), true);
-                tcpOut.println("GETDESCRIPTIONS");
+                tcpOut.println(CommonValues.getDescriptionsForUI);
                 String response = tcpIn.nextLine();
                 ObjectMapper mapper = new ObjectMapper();
                 System.out.println("Descriptions view response : " + response);
@@ -103,12 +100,12 @@ public class BackendCommunicationHandler {
 
     public TreeMap<Long, ArduinoProxy> getSystemsView() {
         try {
-            Socket socket = new Socket("127.0.0.1", port);
+            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
             PrintWriter tcpOut;
             TreeMap<Long, ArduinoProxy> results;
             try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
                 tcpOut = new PrintWriter(socket.getOutputStream(), true);
-                tcpOut.println("GETPROXIES");
+                tcpOut.println(CommonValues.getProxiesForUI);
                 String response = tcpIn.nextLine();
                 ObjectMapper mapper = new ObjectMapper();
                 System.out.println("Systems view response : " + response);
@@ -127,12 +124,12 @@ public class BackendCommunicationHandler {
 
     public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView() {
         try {
-            Socket socket = new Socket("127.0.0.1", port);
+            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
             PrintWriter tcpOut;
             TreeMap<Long, ArrayDeque<EventRecord>> results;
             try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
                 tcpOut = new PrintWriter(socket.getOutputStream(), true);
-                tcpOut.println("GETEVENTS");
+                tcpOut.println(CommonValues.getEventsForUI);
                 String response = tcpIn.nextLine();
                 ObjectMapper mapper = new ObjectMapper();
                 System.out.println("Events view response: " + response);
