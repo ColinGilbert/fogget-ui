@@ -10,10 +10,12 @@ import noob.plantsystem.common.ArduinoProxy;
 import java.util.TreeMap;
 import java.io.IOException;
 import java.sql.Time;
+import java.text.DecimalFormat;
 import java.time.LocalTime;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
+import noob.plantsystem.common.CommonValues;
 import noob.plantsystem.common.TimeOfDayValidator;
 
 /**
@@ -78,7 +80,6 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cellStr += sys.getPersistentState().getUid();
                 cellStr += "\"> View events for this system</a>";
                 textBox.setDescription();
-                //textBox.setHeight(3);
                 textBox.setWidth(70);
                 cells[0].setContents(cellStr);
                 cells[1].setColSpan(horizSpan - firstColSpan);
@@ -106,27 +107,37 @@ public class SystemsViewTag extends SimpleTagSupport {
                 for (int i = 0; i < cells.length; i++) {
                     cells[i].setHeader(false);
                 }
+                final String secondsText = " sec";
+                final String celsiusText = " &#8451;";
+                final String percentText = " %";
+                final String ppmText = " ppM";
                 // Print the misting interval
                 cells[0].setContents("Misting interval");
-                cells[1].setContents(sys.getPersistentState().getMistingInterval() + "ms");
+                cells[1].setContents(sys.getPersistentState().getMistingInterval() / CommonValues.millisInSec + secondsText);
                 textBox.setMistingInterval();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
                 // Print the misting duration
                 cells[0].setContents("Misting duration");
-                cells[1].setContents(sys.getPersistentState().getMistingDuration() + "ms");
+                cells[1].setContents(sys.getPersistentState().getMistingDuration() / CommonValues.millisInSec + secondsText);
                 textBox.setMistingDuration();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
+                //
+                // This particular part of the system is going to be left out until a later revision.
+                // The code works, but we don't need to complicate the user's life with such functionality
+                //
                 // Print the status push interval
-                cells[0].setContents("Status push interval: ");//sys.getStatusPushUpdateInterval())
-                cells[1].setContents(sys.getPersistentState().getStatusPushInterval() + "ms");
-                textBox.setStatusPushInterval();
-                cells[2].setContents(textBox.toString());
-                printRow(out, cells);
+                // cells[0].setContents("Status push interval: ");
+                // cells[1].setContents(sys.getPersistentState().getStatusPushInterval() + secondsText);
+                // texBox.setStatusPushInterval();
+                // cells[2].setContents(textBox.toString());
+                // printRow(out, cells);
+                //
                 // Nutrients to water feed ratio
+                DecimalFormat decimalFormatter = new DecimalFormat("#.#######");
                 cells[0].setContents("Nutrient sol'n to water ratio");
-                cells[1].setContents(Double.toString(sys.getPersistentState().getNutrientSolutionRatio()));
+                cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getNutrientSolutionRatio()));
                 textBox.setNutrientSolutionRatio();
                 cells[2].setContents(textBox.toString());
                 printRow(out, cells);
@@ -141,7 +152,6 @@ public class SystemsViewTag extends SimpleTagSupport {
 
                 } else {
                     cells[1].setContents("Invalid");
-
                 }
                 cells[2].setContents("Invalid");
                 cellStr = "Hours: ";
@@ -170,44 +180,44 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cellStr += textBox.toString();
                 cells[2].setContents(cellStr);
                 printRow(out, cells);
-
                 textBox.setWidth(0);
                 textBox.setWidth(8);
                 // Current upper chamber humidity
+                decimalFormatter = new DecimalFormat("#.###");
                 cells[0].setContents("Current upper chamber humidity");
-                cells[1].setContents(Float.toString(sys.getTransientState().getCurrentUpperChamberHumidity()));
+                cells[1].setContents(decimalFormatter.format(sys.getTransientState().getCurrentUpperChamberHumidity()) + percentText);
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber humidity
                 cells[0].setContents("Target upper chamber humidity");
-                cells[1].setContents(Float.toString(sys.getPersistentState().getTargetUpperChamberHumidity()));
+                cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getTargetUpperChamberHumidity()) + percentText);
                 textBox.setTargetUpperChamberHumidity();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + percentText);
                 printRow(out, cells);
                 // Current upper chamber temperature
                 cells[0].setContents("Current upper chamber temperature ");
-                cells[1].setContents(Float.toString(sys.getTransientState().getCurrentUpperChamberTemperature()));
+                cells[1].setContents(decimalFormatter.format(sys.getTransientState().getCurrentUpperChamberTemperature()) + celsiusText);
                 textBox.setTargetUpperChamberHumidity();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target upper chamber temperature                
                 cells[0].setContents("Target upper chamber temperature");
-                cells[1].setContents(Float.toString(sys.getPersistentState().getTargetUpperChamberTemperature()));
+                cells[1].setContents(decimalFormatter.format(sys.getPersistentState().getTargetUpperChamberTemperature()) + celsiusText);
                 textBox.setTargetUpperChamberTemperature();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + celsiusText);
                 printRow(out, cells);
                 // Current CO2 PPM
                 cells[0].setContents("Current CO2 PPM");
-                cells[1].setContents(Long.toString(sys.getTransientState().getCurrentCO2PPM()));
+                cells[1].setContents(Long.toString(sys.getTransientState().getCurrentCO2PPM()) + ppmText);
                 textBox.setTargetCO2PPM();
                 cells[2].setContents("");
                 printRow(out, cells);
                 // Target CO2 PPM
                 cells[0].setContents("Target CO2 PPM");
-                cells[1].setContents(Long.toString(sys.getPersistentState().getTargetCO2PPM()));
+                cells[1].setContents(Long.toString(sys.getPersistentState().getTargetCO2PPM()) + ppmText);
                 textBox.setTargetCO2PPM();
-                cells[2].setContents(textBox.toString());
+                cells[2].setContents(textBox.toString() + ppmText);
                 printRow(out, cells);
                 out.println("</table>");
                 out.println("<p>");

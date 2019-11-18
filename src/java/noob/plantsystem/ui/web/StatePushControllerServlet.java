@@ -79,17 +79,17 @@ public class StatePushControllerServlet extends HttpServlet {
                                 try {
                                     switch (firstPart) {
                                         case (ParameterNames.updateMistingInterval): {
-                                            configChange.getPersistentState().setMistingInterval(Integer.parseInt(paramValue));
+                                            configChange.getPersistentState().setMistingInterval(Integer.parseInt(paramValue) * 1000);
                                             configChange.setChangingMistingInterval(true);
                                             break;
                                         }
                                         case (ParameterNames.updateMistingDuration): {
-                                            configChange.getPersistentState().setMistingDuration(Integer.parseInt(paramValue));
+                                            configChange.getPersistentState().setMistingDuration(Integer.parseInt(paramValue) * 1000);
                                             configChange.setChangingMistingDuration(true);
                                             break;
                                         }
                                         case (ParameterNames.updateStatusPushInterval): {
-                                            configChange.getPersistentState().setStatusPushInterval(Integer.parseInt(paramValue));
+                                            configChange.getPersistentState().setStatusPushInterval(Integer.parseInt(paramValue) * 1000);
                                             configChange.setChangingStatusPushInterval(true);
                                             break;
                                         }
