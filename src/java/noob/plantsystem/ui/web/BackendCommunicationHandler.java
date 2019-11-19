@@ -5,48 +5,25 @@
  */
 package noob.plantsystem.ui.web;
 
-import java.util.List;
-import java.util.Map;
-
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.HashMap;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
-
 import java.io.IOException;
-import java.io.InputStream;
-
 import noob.plantsystem.common.TopicStrings;
-import noob.plantsystem.common.PersistentArduinoState;
 import noob.plantsystem.common.EventRecord;
 import noob.plantsystem.common.ArduinoProxy;
 import noob.plantsystem.common.ArduinoConfigChangeRepresentation;
-
 import org.eclipse.paho.client.mqttv3.MqttClient;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
-import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
-import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
-
 import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.core.json.JsonFactory;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import com.fasterxml.jackson.core.TokenStreamFactory;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.TreeMap;
 import noob.plantsystem.common.CommonValues;
