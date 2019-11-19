@@ -27,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.TreeMap;
 import noob.plantsystem.common.CommonValues;
+import noob.plantsystem.common.ConnectionUtils;
 
 /**
  *
@@ -34,11 +35,15 @@ import noob.plantsystem.common.CommonValues;
  */
 public class BackendCommunicationHandler {
 
+    ObjectMapper mapper = new ObjectMapper();
+
     public boolean connect() {
+        
         MqttConnectOptions connectionOptions = new MqttConnectOptions();
+        
         connectionOptions.setCleanSession(true); // We want the broker to remember past subscriptions.
         try {
-            client = new MqttClient(CommonValues.mqttBrokerURL, MqttClient.generateClientId(), new MemoryPersistence());
+            client = new MqttClient(CommonValues.mqttBrokerURL, CommonValues.mqttServletClientID, new MemoryPersistence());
         } catch (MqttException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
             return false;
@@ -48,77 +53,120 @@ public class BackendCommunicationHandler {
         } catch (MqttException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
             return false;
+        } catch (Exception ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return false;
         }
         System.out.println("Connected to backend. :)");
         return true;
     }
 
-    public TreeMap<Long, String> getSystemDescriptionsView() {
+    public void close() {
         try {
-            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
-            PrintWriter tcpOut;
-            TreeMap<Long, String> results;
-            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
-                tcpOut = new PrintWriter(socket.getOutputStream(), true);
-                tcpOut.println(CommonValues.getDescriptionsForUI);
-                String response = tcpIn.nextLine();
-                ObjectMapper mapper = new ObjectMapper();
-                System.out.println("Descriptions view response : " + response);
-                results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
-                });
-            }
-            tcpOut.close();
-            return results;
-        } catch (IOException ex) {
+            client.close();
+        } catch (MqttException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new TreeMap<>();
+        System.out.println("Connected to backend. :)");
+    }
+
+    public TreeMap<Long, String> getSystemDescriptionsView() {
+        TreeMap<Long, String> results = new TreeMap();
+        Socket socket = null;
+        String response = null;
+        try {
+            socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
+        } catch (IOException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            return results;
+        }
+        PrintWriter tcpOut = null;
+        Scanner tcpIn = null;
+        try {
+            tcpIn = new Scanner(socket.getInputStream());
+            tcpOut = new PrintWriter(socket.getOutputStream(), true);
+            tcpOut.println(CommonValues.getDescriptionsForUI);
+            response = tcpIn.nextLine();
+            System.out.println("Descriptions view response : " + response);
+            results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
+            });
+        } catch (IOException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        /*
+        try {
+            tcpIn.close();
+        } catch (Exception ex) {
+               Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
+            tcpOut.close();
+        } catch (Exception ex) {
+                Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);        
+        }
+        try {
+        tcpOut.close();
+        } catch (Exception ex) {
+                        Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+
+        }
+*/
+        ConnectionUtils.closeConnection(tcpIn, tcpOut, socket);
+        return results;
     }
 
     public TreeMap<Long, ArduinoProxy> getSystemsView() {
+            Socket socket = null;
+            PrintWriter tcpOut = null;
+             Scanner tcpIn = null;
+            TreeMap<Long, ArduinoProxy> results = new TreeMap<>();
+            String response = "";
         try {
-            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
-            PrintWriter tcpOut;
-            TreeMap<Long, ArduinoProxy> results;
-            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
+            socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
+            tcpIn = new Scanner(socket.getInputStream());
                 tcpOut = new PrintWriter(socket.getOutputStream(), true);
                 tcpOut.println(CommonValues.getProxiesForUI);
-                String response = tcpIn.nextLine();
-                ObjectMapper mapper = new ObjectMapper();
+                response = tcpIn.nextLine();
                 System.out.println("Systems view response : " + response);
                 results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArduinoProxy>>() {
                 });
-            }
-            tcpOut.close();
-            
-            return results;
-
         } catch (IOException ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+        }catch (Exception ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new TreeMap<>();
+        ConnectionUtils.closeConnection(tcpIn, tcpOut, socket);
+        return results;
     }
 
     public TreeMap<Long, ArrayDeque<EventRecord>> getEventsView() {
+        Socket socket = null;
+         PrintWriter tcpOut = null;
+         Scanner tcpIn = null;
+                     TreeMap<Long, ArrayDeque<EventRecord>> results = new TreeMap<>();
+                     String response  = "";
         try {
-            Socket socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
-            PrintWriter tcpOut;
-            TreeMap<Long, ArrayDeque<EventRecord>> results;
-            try (Scanner tcpIn = new Scanner(socket.getInputStream())) {
+            socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
+           
+                tcpIn = new Scanner(socket.getInputStream());
                 tcpOut = new PrintWriter(socket.getOutputStream(), true);
                 tcpOut.println(CommonValues.getEventsForUI);
-                String response = tcpIn.nextLine();
-                ObjectMapper mapper = new ObjectMapper();
+                response = tcpIn.nextLine();              
                 System.out.println("Events view response: " + response);
                 results = mapper.readValue(response, new TypeReference<TreeMap<Long, ArrayDeque<EventRecord>>>() {
+                    
                 });
-            } 
-            tcpOut.close();
-            return results;
-        } catch (IOException ex) {
+            } catch (IOException ex) {
+            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+          } catch (Exception ex) {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return new TreeMap<>();
+        ConnectionUtils.closeConnection(tcpIn, tcpOut, socket);
+        return results;
     }
 
     public void sendControlInformation(ArrayList<ArduinoConfigChangeRepresentation> arg) {
@@ -139,8 +187,8 @@ public class BackendCommunicationHandler {
         }
     }
 
-        public void sendSystemDescriptionUpdate(TreeMap<Long, String> descriptions) {
-       MqttMessage message = new MqttMessage();
+    public void sendSystemDescriptionUpdate(TreeMap<Long, String> descriptions) {
+        MqttMessage message = new MqttMessage();
         ObjectMapper mapper = new ObjectMapper();
         try {
             message.setPayload(mapper.writeValueAsString(descriptions).getBytes());
@@ -155,8 +203,7 @@ public class BackendCommunicationHandler {
             Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
+
     protected MqttClient client;
 
     TreeMap<Long, ArrayDeque<EventRecord>> eventsViewData = new TreeMap<>();

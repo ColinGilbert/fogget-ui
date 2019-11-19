@@ -52,47 +52,56 @@ public class EventsViewTag extends SimpleTagSupport {
 
     @Override
     public void doTag() throws JspException, IOException {
-        try {
-        long uidLocal = Long.parseLong(uid);
         JspWriter out = getJspContext().getOut();
         BackendCommunicationHandler backend = new BackendCommunicationHandler();
-        out.println("<table>");
-        final int horizSpan = 2;
         TreeMap<Long, String> allDescriptions = backend.getSystemDescriptionsView();
-        out.println("Events for system with UID: " + uid);
-        out.println("<p>");
-        out.println("Description: ");
-        out.println(allDescriptions.getOrDefault(Long.parseLong(uid), "No description. <a href=\"index.jsp\">Click here</a> to go back and set one!"));
-        out.println("</p>");
-        TableCell cells[] = new TableCell[horizSpan];
-        for (int i = 0; i < cells.length; i++) {
-            cells[i] = new TableCell();
-        }
-        for (int i = 0; i < cells.length; i++) {
-            cells[i].setHeader(true);
-        }
-        cells[0].setContents("Time");
-        cells[1].setContents("Description");
-        printRow(out, cells);
-        for (int i = 0; i < cells.length; i++) {
-            cells[i].setHeader(false);
-        }
-        ArduinoEventDescriptions eventDescriptions = new ArduinoEventDescriptions();
-        TreeMap<Long, ArrayDeque<EventRecord>> allEvents = backend.getEventsView();
-        if (allEvents.containsKey(uidLocal)) {
-            for (EventRecord event : allEvents.get(uidLocal)) {
-                Date date = new Time(event.getTimestamp());
-                cells[0].setContents(date.toString());
-                String eventDescriptionResult = eventDescriptions.getDescription(event.getEvent()).getValue();
+        TreeMap<Long, ArrayDeque<EventRecord>> allEvents = null;
+        TableCell cells[]  = null;
+        Date date = null;
+        ArduinoEventDescriptions eventDescriptions  = null;
+        String eventDescriptionResult = "";
+        try {
+            long uidLocal = Long.parseLong(uid);
+            out.println("<table>");
+            final int horizSpan = 2;
+            out.println("Events for system with UID: " + uid);
+            out.println("<p>");
+            out.println("Description: ");
+            out.println(allDescriptions.getOrDefault(Long.parseLong(uid), "No description. <a href=\"index.jsp\">Click here</a> to go back and set one!"));
+            out.println("</p>");
+            cells = new TableCell[horizSpan];
+            for (int i = 0; i < cells.length; i++) {
+                cells[i] = new TableCell();
+            }
+            for (int i = 0; i < cells.length; i++) {
+                cells[i].setHeader(true);
+            }
+            cells[0].setContents("Time");
+            cells[1].setContents("Description");
+            printRow(out, cells);
+            for (int i = 0; i < cells.length; i++) {
+                cells[i].setHeader(false);
+            }
+            eventDescriptions = new ArduinoEventDescriptions();
+            allEvents = backend.getEventsView();
+            if (allEvents.containsKey(uidLocal)) {
+                for (EventRecord event : allEvents.get(uidLocal)) {
+                    date = new Time(event.getTimestamp());
+                    cells[0].setContents(date.toString());
+                    eventDescriptionResult = eventDescriptions.getDescription(event.getEvent()).getValue();
                     eventDescriptionResult = eventDescriptionResult.replaceAll("_", " ");
                     cells[1].setContents(eventDescriptionResult.toLowerCase());
-                                    printRow(out, cells);
+                    printRow(out, cells);
                 }
             }
-        out.println("</table>");
-        out.println("</p>");
+            out.println("</table>");
+            out.println("</p>");
         } catch (NumberFormatException ex) {
-                Logger.getLogger(EventsViewTag.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(EventsViewTag.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(EventsViewTag.class.getName()).log(Level.SEVERE, null, ex);
+            
+        }
+        backend.close();
     }
-}
 }

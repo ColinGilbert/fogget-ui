@@ -258,9 +258,11 @@ public class SystemsViewTag extends SimpleTagSupport {
                 out.println("</table>");
                 //out.println("<br />");
                 out.println("<input type=\"submit\">");
+                
             }
         } else { // Print error message for user.
             out.println("Could not connect to backend. :(");
         }
+        backend.close();
     }
 }
