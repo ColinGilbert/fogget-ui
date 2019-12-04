@@ -13,7 +13,6 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Scanner;
 import java.io.IOException;
-import noob.plantsystem.common.CommonValues;
 import noob.plantsystem.common.EventRecordMemento;
 import noob.plantsystem.common.EmbeddedSystemCombinedStateMemento;
 import noob.plantsystem.common.EmbeddedSystemConfigChangeMemento;
@@ -33,9 +32,10 @@ import noob.plantsystem.common.ConnectionCloser;
  *
  * @author noob
  */
-public class BackendCommunicationHandler {
+public class BackendCommunicationFacade {
 
-    ObjectMapper mapper = new ObjectMapper();
+    protected MqttClient client;
+    protected ObjectMapper mapper = new ObjectMapper();
 
     public boolean connect() {
         
@@ -45,16 +45,16 @@ public class BackendCommunicationHandler {
         try {
             client = new MqttClient(CommonValues.mqttBrokerURL, CommonValues.mqttServletClientID, new MemoryPersistence());
         } catch (MqttException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         try {
             client.connect();
         } catch (MqttException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         } catch (Exception ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return false;
         }
         System.out.println("Connected to backend. :)");
@@ -63,13 +63,20 @@ public class BackendCommunicationHandler {
 
     public void close() {
         try {
+            client.disconnect();
+        } catch (MqttException ex) {
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (Exception ex) {
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        try {
             client.close();
         } catch (MqttException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
-        System.out.println("Connected to backend. :)");
+        System.out.println("Disconnected from backend. Goodbye.");
     }
 
     public TreeMap<Long, String> getSystemDescriptionsView() {
@@ -79,7 +86,7 @@ public class BackendCommunicationHandler {
         try {
             socket = new Socket(CommonValues.localhost, CommonValues.localUIPort);
         } catch (IOException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return results;
         }
         PrintWriter tcpOut = null;
@@ -93,25 +100,25 @@ public class BackendCommunicationHandler {
             results = mapper.readValue(response, new TypeReference<TreeMap<Long, String>>() {
             });
         } catch (IOException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         } catch (Exception ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
         /*
         try {
             tcpIn.close();
         } catch (Exception ex) {
-               Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+               Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
         try {
             tcpOut.close();
         } catch (Exception ex) {
-                Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);        
+                Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);        
         }
         try {
         tcpOut.close();
         } catch (Exception ex) {
-                        Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+                        Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
 
         }
 */
@@ -135,9 +142,9 @@ public class BackendCommunicationHandler {
                 results = mapper.readValue(response, new TypeReference<TreeMap<Long, EmbeddedSystemCombinedStateMemento>>() {
                 });
         } catch (IOException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }catch (Exception ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
         ConnectionCloser.closeConnection(tcpIn, tcpOut, socket);
         return results;
@@ -161,9 +168,9 @@ public class BackendCommunicationHandler {
                     
                 });
             } catch (IOException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
           } catch (Exception ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
         ConnectionCloser.closeConnection(tcpIn, tcpOut, socket);
         return results;
@@ -176,14 +183,14 @@ public class BackendCommunicationHandler {
         try {
             message.setPayload(mapper.writeValueAsString(arg).getBytes());
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
         try {
             System.out.println(message.toString());
             client.publish(CommonValues.configEmbeddedRequestTopic, message);
         } catch (MqttException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -193,19 +200,14 @@ public class BackendCommunicationHandler {
         try {
             message.setPayload(mapper.writeValueAsString(descriptions).getBytes());
         } catch (JsonProcessingException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
             return;
         }
         try {
             System.out.println(message.toString());
             client.publish(CommonValues.updateDescriptionRequestTopic, message);
         } catch (MqttException ex) {
-            Logger.getLogger(BackendCommunicationHandler.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(BackendCommunicationFacade.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-
-    protected MqttClient client;
-
-    TreeMap<Long, ArrayDeque<EventRecordMemento>> eventsViewData = new TreeMap<>();
-    ArrayList<EmbeddedSystemCombinedStateMemento> systemsViewData = new ArrayList<>();
 }

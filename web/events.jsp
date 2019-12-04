@@ -5,12 +5,6 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.TreeMap" %>
-<%@ page import="java.util.ArrayList" %>
-<%@ page import="java.util.ArrayDeque" %>
-<%@ page import="noob.plantsystem.common.EventRecord" %>
-<%@ page import="noob.plantsystem.ui.web.BackendCommunicationHandler" %>
-<%@ page import="noob.plantsystem.common.ArduinoProxy" %>
 <%@ taglib prefix="noob" uri="WEB-INF/tlds/fogget-tags.tld"%>
 
 

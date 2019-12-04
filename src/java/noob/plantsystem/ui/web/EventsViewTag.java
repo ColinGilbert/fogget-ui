@@ -17,8 +17,8 @@ import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
 
-import noob.plantsystem.common.ArduinoEventDescriptions;
-import noob.plantsystem.common.EventRecord;
+import noob.plantsystem.common.EmbeddedSystemEventDescriptions;
+import noob.plantsystem.common.EventRecordMemento;
 
 /**
  *
@@ -32,18 +32,18 @@ public class EventsViewTag extends SimpleTagSupport {
         uid = arg;
     }
 
-    protected void printRow(JspWriter writer, TableCell cells[]) throws IOException {
+    protected void printRow(JspWriter writer, TableCellBuilder cells[]) throws IOException {
         writer.println("<tr>");
-        for (TableCell c : cells) {
+        for (TableCellBuilder c : cells) {
             writer.println(c.toString());
         }
         writer.println("</tr>");
     }
 
-    protected TableCell booleanCell(boolean arg) {
-        TableCell c = new TableCell();
+    protected TableCellBuilder booleanCell(boolean arg) {
+        TableCellBuilder c = new TableCellBuilder();
         if (arg) {
-            //c.setContents("Yes");
+            // c.setContents("Yes");
         } else {
             // c.setContents("No");
         }
@@ -53,12 +53,12 @@ public class EventsViewTag extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
         JspWriter out = getJspContext().getOut();
-        BackendCommunicationHandler backend = new BackendCommunicationHandler();
+        BackendCommunicationFacade backend = new BackendCommunicationFacade();
         TreeMap<Long, String> allDescriptions = backend.getSystemDescriptionsView();
-        TreeMap<Long, ArrayDeque<EventRecord>> allEvents = null;
-        TableCell cells[]  = null;
+        TreeMap<Long, ArrayDeque<EventRecordMemento>> allEvents = null;
+        TableCellBuilder cells[]  = null;
         Date date = null;
-        ArduinoEventDescriptions eventDescriptions  = null;
+        EmbeddedSystemEventDescriptions eventDescriptions  = null;
         String eventDescriptionResult = "";
         try {
             long uidLocal = Long.parseLong(uid);
@@ -69,9 +69,9 @@ public class EventsViewTag extends SimpleTagSupport {
             out.println("Description: ");
             out.println(allDescriptions.getOrDefault(Long.parseLong(uid), "No description. <a href=\"index.jsp\">Click here</a> to go back and set one!"));
             out.println("</p>");
-            cells = new TableCell[horizSpan];
+            cells = new TableCellBuilder[horizSpan];
             for (int i = 0; i < cells.length; i++) {
-                cells[i] = new TableCell();
+                cells[i] = new TableCellBuilder();
             }
             for (int i = 0; i < cells.length; i++) {
                 cells[i].setHeader(true);
@@ -82,10 +82,10 @@ public class EventsViewTag extends SimpleTagSupport {
             for (int i = 0; i < cells.length; i++) {
                 cells[i].setHeader(false);
             }
-            eventDescriptions = new ArduinoEventDescriptions();
+            eventDescriptions = new EmbeddedSystemEventDescriptions();
             allEvents = backend.getEventsView();
             if (allEvents.containsKey(uidLocal)) {
-                for (EventRecord event : allEvents.get(uidLocal)) {
+                for (EventRecordMemento event : allEvents.get(uidLocal)) {
                     date = new Time(event.getTimestamp());
                     cells[0].setContents(date.toString());
                     eventDescriptionResult = eventDescriptions.getDescription(event.getEvent()).getValue();

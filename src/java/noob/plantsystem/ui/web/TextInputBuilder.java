@@ -5,7 +5,7 @@
  */
 package noob.plantsystem.ui.web;
 
-// import noob.plantsystem.common.ArduinoProxy;
+import noob.plantsystem.common.EmbeddedSystemCombinedStateMemento;
 
 import javax.servlet.jsp.JspWriter;
 
@@ -13,7 +13,7 @@ import javax.servlet.jsp.JspWriter;
  *
  * @author noob
  */
-public class TextInput {
+public class TextInputBuilder {
 
     JspWriter writer;
     //ArduinoProxy proxy;
@@ -35,7 +35,7 @@ public class TextInput {
     int height = 0;
     long uid = 0;
 
-    public TextInput(JspWriter writer, long uidArg) {
+    public TextInputBuilder(JspWriter writer, long uidArg) {
         this.writer = writer;
         uid = uidArg;
     }

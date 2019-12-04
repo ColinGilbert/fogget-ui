@@ -5,7 +5,7 @@
  */
 package noob.plantsystem.ui.web;
 
-import noob.plantsystem.common.ArduinoProxy;
+import noob.plantsystem.common.EmbeddedSystemCombinedStateMemento;
 
 import java.util.TreeMap;
 import java.io.IOException;
@@ -25,16 +25,16 @@ public class SystemsViewTag extends SimpleTagSupport {
 
     protected final int horizSpan = 8;
 
-    protected void printRow(JspWriter writer, TableCell cells[]) throws IOException {
+    protected void printRow(JspWriter writer, TableCellBuilder cells[]) throws IOException {
         writer.println("<tr>");
-        for (TableCell c : cells) {
+        for (TableCellBuilder c : cells) {
             writer.println(c.toString());
         }
         writer.println("</tr>");
     }
 
-    protected TableCell booleanCell(boolean arg) {
-        TableCell c = new TableCell();
+    protected TableCellBuilder booleanCell(boolean arg) {
+        TableCellBuilder c = new TableCellBuilder();
         if (arg) {
             c.setContents("Yes");
         } else {
@@ -46,21 +46,21 @@ public class SystemsViewTag extends SimpleTagSupport {
     @Override
     public void doTag() throws JspException, IOException {
         JspWriter out = getJspContext().getOut();
-        BackendCommunicationHandler backend = new BackendCommunicationHandler();
+        BackendCommunicationFacade backend = new BackendCommunicationFacade();
         boolean connected = backend.connect();
         if (connected) {
-            TreeMap<Long, ArduinoProxy> systems = backend.getSystemsView();
+            TreeMap<Long, EmbeddedSystemCombinedStateMemento> systems = backend.getSystemsView();
             TreeMap<Long, String> descriptions = backend.getSystemDescriptionsView();
-            for (ArduinoProxy sys : systems.values()) {
+            for (EmbeddedSystemCombinedStateMemento sys : systems.values()) {
                 // out.println("<br />");
                 out.println("<table>");
                 int firstColSpan = 2;
                 final long uid = sys.getPersistentState().getUid();
                 // Print the description and uid.
-                TableCell cells[] = new TableCell[2];
-                TextInput textBox = new TextInput(out, sys.getPersistentState().getUid());
+                TableCellBuilder cells[] = new TableCellBuilder[2];
+                TextInputBuilder textBox = new TextInputBuilder(out, sys.getPersistentState().getUid());
                 for (int i = 0; i < cells.length; i++) {
-                    TableCell c = new TableCell();
+                    TableCellBuilder c = new TableCellBuilder();
                     cells[i] = c;
                 }
                 cells[0].setColSpan(firstColSpan);
@@ -87,11 +87,11 @@ public class SystemsViewTag extends SimpleTagSupport {
                 textBox.setHeight(1);
                 textBox.setWidth(8);
                 printRow(out, cells);
-                cells = new TableCell[3];
+                cells = new TableCellBuilder[3];
                 // Instantiate the objects
                 for (int i = 0; i < cells.length; i++) {
-                    TableCell c = new TableCell();
-                    cells[i] = c;//new TableCell();
+                    TableCellBuilder c = new TableCellBuilder();
+                    cells[i] = c;//new TableCellBuilder();
                 }
                 for (int i = 0; i < cells.length; i++) {
                     cells[i].setHeader(true);
@@ -220,11 +220,11 @@ public class SystemsViewTag extends SimpleTagSupport {
                 out.println("<p>");
                 out.println("<table>");
                 // Now, we do the all the boolean values.
-                cells = new TableCell[8];
+                cells = new TableCellBuilder[8];
                 for (int i = 0; i < cells.length; i++) {
-                    cells[i] = new TableCell();
+                    cells[i] = new TableCellBuilder();
                 }
-                for (TableCell cell : cells) {
+                for (TableCellBuilder cell : cells) {
                     cell.setHeader(true);
                     cell.setColSpan(1);
                 }
@@ -237,7 +237,7 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cells[6].setContents("Cooling");
                 cells[7].setContents("Injecting CO2");
                 printRow(out, cells);
-                for (TableCell cell : cells) {
+                for (TableCellBuilder cell : cells) {
                     cell.setHeader(false);
                 }
                 cells[0] = booleanCell(sys.getTransientState().isPowered());
@@ -249,11 +249,11 @@ public class SystemsViewTag extends SimpleTagSupport {
                 cells[6] = booleanCell(sys.getTransientState().isCooling());
                 cells[7] = booleanCell(sys.getTransientState().isInjectingCO2());
                 printRow(out, cells);
-                cells = new TableCell[1];
+                cells = new TableCellBuilder[1];
                 // Instantiate the objects
                 for (int i = 0; i < cells.length; i++) {
-                    TableCell c = new TableCell();
-                    cells[i] = c;//new TableCell();
+                    TableCellBuilder c = new TableCellBuilder();
+                    cells[i] = c;//new TableCellBuilder();
                 }
                 out.println("</table>");
                 //out.println("<br />");

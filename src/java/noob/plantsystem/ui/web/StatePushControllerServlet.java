@@ -6,7 +6,6 @@
 package noob.plantsystem.ui.web;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.TreeMap;
@@ -19,11 +18,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import noob.plantsystem.common.ArduinoConfigChangeRepresentation;
-import noob.plantsystem.common.ArduinoProxy;
-import noob.plantsystem.common.TimeOfDayValidator;
-import noob.plantsystem.common.TopicStrings;
-import org.eclipse.paho.client.mqttv3.MqttClient;
+import noob.plantsystem.common.EmbeddedSystemConfigChangeMemento;
+
 
 /**
  *
@@ -42,12 +38,12 @@ public class StatePushControllerServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        BackendCommunicationHandler backend = new BackendCommunicationHandler();
+        BackendCommunicationFacade backend = new BackendCommunicationFacade();
         boolean connected = backend.connect();
         if (connected) {
             Pattern pattern = Pattern.compile("^[0-9]+$"); // Only numerics
             Enumeration<String> parameterNames = request.getParameterNames();
-            TreeMap<Long, ArduinoConfigChangeRepresentation> sentToBackend = new TreeMap<>();
+            TreeMap<Long, EmbeddedSystemConfigChangeMemento> sentToBackend = new TreeMap<>();
             boolean changingDescriptions = false;
             TreeMap<Long, String> descriptionsToChange = new TreeMap<>();
             while (parameterNames.hasMoreElements()) {
@@ -59,12 +55,12 @@ public class StatePushControllerServlet extends HttpServlet {
                         System.out.println("Got proper params for machine " + splitParamName[1]);
                         long uid = Long.parseLong(splitParamName[1]);
                         String[] paramValues = request.getParameterValues(fullParamName);
-                        ArduinoConfigChangeRepresentation configChange;// = new ArduinoConfigChangeRepresentation();
+                        EmbeddedSystemConfigChangeMemento configChange;// = new EmbeddedSystemConfigChangeMemento();
                         if (sentToBackend.containsKey(uid)) {
                             configChange = sentToBackend.get(uid);
                         } else {
-                            configChange = new ArduinoConfigChangeRepresentation();
-//                            configChange.setPersistentState(new);
+                            configChange = new EmbeddedSystemConfigChangeMemento();
+                           // configChange.setPersistentState(new);
                         }
                         for (String paramValue : paramValues) {
                             if (!"".equals(paramValue)) { // If we actually have a parameter to send to our backend
@@ -161,8 +157,8 @@ public class StatePushControllerServlet extends HttpServlet {
                 }
             }
             if (sentToBackend.size() > 0) {
-                ArrayList<ArduinoConfigChangeRepresentation> results = new ArrayList<>();
-                for (ArduinoConfigChangeRepresentation r : sentToBackend.values()) {
+                ArrayList<EmbeddedSystemConfigChangeMemento> results = new ArrayList<>();
+                for (EmbeddedSystemConfigChangeMemento r : sentToBackend.values()) {
                     results.add(r);
                 }
                 backend.sendControlInformation(results);
